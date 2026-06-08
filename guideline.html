@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>二次創作ガイドライン</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --bg: #f9f9f7;
+    --text-main: #1a1a1a;
+    --text-sub: #555;
+    --text-muted: #888;
+    --border: #e0e0dc;
+    --accent: #1a1a1a;
+    --tag-bg: #f2f2f0;
+    --link: #2a6496;
+    --section-border: #d0d0cc;
+    --note-bg: #fafaf8;
+  }
+
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0 2rem;
+    text-align: center;
+  }
+
+  header .site-name {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-main);
+  }
+
+  header .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .intro {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.9;
+  }
+
+  .section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+
+  .section-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    background: var(--tag-bg);
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .section-body {
+    padding: 1.5rem;
+  }
+
+  .rule-block {
+    margin-bottom: 1.25rem;
+  }
+
+  .rule-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .rule-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .rule-text {
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.85;
+  }
+
+  .status-ok {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: #eaf3de;
+    color: #3b6d11;
+    border: 1px solid #c0dd97;
+    border-radius: 3px;
+    padding: 1px 7px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .status-ng {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fcebeb;
+    color: #a32d2d;
+    border: 1px solid #f7c1c1;
+    border-radius: 3px;
+    padding: 1px 7px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .status-note {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: #faeeda;
+    color: #854f0b;
+    border: 1px solid #fac775;
+    border-radius: 3px;
+    padding: 1px 7px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.25rem 0;
+  }
+
+  .link-list {
+    list-style: none;
+    margin-top: 0.75rem;
+  }
+
+  .link-list li {
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+  }
+
+  .link-list li::before {
+    content: '→ ';
+    color: var(--text-muted);
+  }
+
+  .link-list a {
+    color: var(--link);
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .link-list a:hover {
+    text-decoration: underline;
+  }
+
+  .search-tip {
+    background: var(--note-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .search-tip-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .search-tip ol {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 13.5px;
+    color: var(--text-sub);
+    line-height: 1.85;
+  }
+
+  .search-tip ol li {
+    margin-bottom: 0.25rem;
+  }
+
+  .example-list {
+    margin-top: 1rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  .example-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .example-list-items {
+    list-style: none;
+  }
+
+  .example-list-items li {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-bottom: 0.4rem;
+  }
+
+  .example-list-items li::before {
+    content: '• ';
+    color: var(--text-muted);
+  }
+
+  .example-list-items a {
+    color: var(--link);
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .example-list-items a:hover {
+    text-decoration: underline;
+  }
+
+  .contact-block {
+    margin-top: 0.75rem;
+  }
+
+  .contact-email {
+    display: inline-block;
+    font-size: 14px;
+    color: var(--link);
+    word-break: break-all;
+  }
+
+  .contact-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    line-height: 1.75;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 1.5rem 1rem 4rem; }
+    header h1 { font-size: 18px; }
+    .section-body { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-name">Official Guideline</div>
+  <h1>二次創作ガイドライン</h1>
+  <div class="subtitle">二次創作・楽曲利用に関するルールをまとめています。</div>
+</header>
+
+<main>
+
+  <div class="intro">
+    このページは、個人制作楽曲の二次創作・利用に際してのガイドラインです。<br>
+    各セクションをご確認の上、ルールに沿ったご利用をお願い申し上げます。
+  </div>
+
+  <!-- Section 1: 動画投稿 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-tag">01</span>
+      <span class="section-title">動画共有サービスへのアップロード（歌ってみた・演奏してみた 等）</span>
+    </div>
+    <div class="section-body">
+
+      <div class="rule-block">
+        <div class="rule-label">利用条件</div>
+        <div class="rule-text">
+          <span class="status-ok">OK</span>個人としての公開かつ非営利目的に限り、歌詞・Instrumental音源の使用を許可しております。
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">報告</div>
+        <div class="rule-text">
+          <span class="status-note">任意</span>基本的に報告は任意としております。
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">禁止事項</div>
+        <div class="rule-text">
+          <div style="margin-bottom:0.5rem;"><span class="status-ng">NG</span>二次創作音源の第三者への配布</div>
+          <div><span class="status-ng">NG</span>作品の悪意ある使用・改変</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">クレジット表記</div>
+        <div class="rule-text">
+          アップロードの際は、動画説明文に以下をご記載ください。<br>
+          <ul style="margin-top:0.5rem; padding-left:1.25rem; font-size:14px; color:var(--text-sub); line-height:1.85;">
+            <li>原曲のURL</li>
+            <li>制作者クレジット</li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">音源・歌詞の入手先</div>
+        <div class="rule-text">インスト音源・歌詞については下記よりご確認ください。</div>
+        <ul class="link-list" style="margin-top:0.5rem;">
+          <li><a href="https://piapro.jp/neru_sleep" target="_blank" rel="noopener">PIAPRO（ピアプロ）: https://piapro.jp/neru_sleep</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section 2: 営利目的 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-tag">02</span>
+      <span class="section-title">営利目的での使用</span>
+    </div>
+    <div class="section-body">
+
+      <div class="rule-block">
+        <div class="rule-label">対象となる利用</div>
+        <div class="rule-text">
+          既存音源の収録、二次創作音源の収録など営利目的の利用については、JASRAC / NexTone 直接管理の一部用途を除いて、<strong>楽曲の管理信託先の出版社への申請が必要</strong>となる場合がございます。<br>
+          配布インスト等の公式音源の利用有無にかかわらず、申請が必要です。
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">信託先の確認方法</div>
+        <div class="rule-text">
+          JASRAC または NexTone の公式サイトにて利用希望楽曲を検索し、信託先の出版社をご確認ください。
+        </div>
+        <div class="search-tip">
+          <div class="search-tip-title">確認の手順</div>
+          <ol>
+            <li>各公式サイトのデータベースで楽曲を検索</li>
+            <li>JASRAC の場合：楽曲詳細ページ内「管理状況詳細」→「出版者」</li>
+            <li>NexTone の場合：楽曲詳細ページ内「関係権利者情報」→「権利者名」</li>
+            <li>該当する出版社の公式サイトのフォーム等からお申請ください</li>
+          </ol>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">各管理団体</div>
+        <ul class="link-list">
+          <li><a href="https://www.jasrac.or.jp" target="_blank" rel="noopener">JASRAC 公式サイト: https://www.jasrac.or.jp</a></li>
+          <li><a href="https://www.nex-tone.co.jp" target="_blank" rel="noopener">NexTone 公式サイト: https://www.nex-tone.co.jp</a></li>
+        </ul>
+      </div>
+
+      <div class="example-list">
+        <div class="example-title">申請先窓口の例</div>
+        <ul class="example-list-items">
+          <li>株式会社EMP（EXIT TUNES）：<a href="https://exittunes.com/guideline/" target="_blank" rel="noopener">https://exittunes.com/guideline/</a></li>
+          <li>株式会社ドワンゴ：<a href="https://dwango.co.jp/contact/#contact-3" target="_blank" rel="noopener">https://dwango.co.jp/contact/#contact-3</a></li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">問い合わせ先が不明な場合</div>
+        <div class="rule-text">
+          申請先が不明な場合は下記アドレスよりご連絡ください。<br>
+          <a href="mailto:info@neru-official.com" class="contact-email">info@neru-official.com</a>
+        </div>
+        <div class="contact-note">※ すべてのお問い合わせへの返信をお約束することはできかねますので、予めご了承ください。</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section 3: グッズ制作 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-tag">03</span>
+      <span class="section-title">楽曲イメージキャラクターのグッズ等の制作</span>
+    </div>
+    <div class="section-body">
+
+      <div class="rule-block">
+        <div class="rule-label">利用条件</div>
+        <div class="rule-text">
+          <span class="status-ok">OK</span>個人としての公開かつ非営利目的、または同人規模の制作については報告は任意で構いません。
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="rule-block">
+        <div class="rule-label">注意事項</div>
+        <div class="rule-text">
+          各イラストレーターのガイドライン等の指示を必ずご確認の上、その条件内で制作いただくようお願い申し上げます。
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section 4: 連絡先 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-tag">04</span>
+      <span class="section-title">連絡先</span>
+    </div>
+    <div class="section-body">
+
+      <div class="rule-block">
+        <div class="rule-label">楽曲制作依頼・その他お問い合わせ</div>
+        <div class="rule-text">
+          楽曲制作のご依頼等、お気軽に下記アドレスよりご連絡ください。
+        </div>
+        <div class="contact-block" style="margin-top:0.75rem;">
+          <a href="mailto:info@neru-official.com" class="contact-email">info@neru-official.com</a>
+        </div>
+        <div class="contact-note">
+          ※ 上記ガイドラインに関するご報告・お問い合わせいただいたもののほか、すべての内容について返信いたしかねる場合がございますので、予めご了承ください。
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  &copy; neru. All Rights Reserved.
+</footer>
+
+</body>
+</html>
