@@ -412,6 +412,7 @@
     let matrixColumnCount = 0;
     let matrixFontSize = 16;
     let matrixIntensity = 0.18;
+    let fixedWidthGroupCounter = 0;
 
     function resizeMatrix() {
       const pixelRatio = window.devicePixelRatio || 1;
@@ -802,25 +803,41 @@
       terminal.scrollTo({ top: terminal.scrollHeight });
     }
 
-    function fitFixedWidthLine(line) {
-      if (!line.classList.contains("table-ascii") && !line.classList.contains("logo-ascii")) {
+    function fitFixedWidthGroup(lines) {
+      if (!lines.length) {
         return;
       }
-      line.style.fontSize = "";
+      lines.forEach((line) => {
+        line.style.fontSize = "";
+      });
       const availableWidth = terminal.clientWidth - 2;
-      if (line.scrollWidth <= availableWidth) {
+      const widestLine = lines.reduce((widest, line) => (
+        line.scrollWidth > widest.scrollWidth ? line : widest
+      ), lines[0]);
+      if (widestLine.scrollWidth <= availableWidth) {
         return;
       }
-      const currentSize = parseFloat(getComputedStyle(line).fontSize);
+      const currentSize = parseFloat(getComputedStyle(widestLine).fontSize);
       if (!currentSize) {
         return;
       }
-      const scale = Math.max(0.62, availableWidth / line.scrollWidth);
-      line.style.fontSize = `${currentSize * scale}px`;
+      const scale = Math.max(0.62, availableWidth / widestLine.scrollWidth);
+      const fittedSize = `${currentSize * scale}px`;
+      lines.forEach((line) => {
+        line.style.fontSize = fittedSize;
+      });
     }
 
     function refitFixedWidthLines() {
-      terminal.querySelectorAll(".table-ascii, .logo-ascii").forEach(fitFixedWidthLine);
+      const groupedLines = new Map();
+      terminal.querySelectorAll(".table-ascii, .logo-ascii").forEach((line) => {
+        const groupId = line.dataset.fitGroup || `single-${Math.random()}`;
+        if (!groupedLines.has(groupId)) {
+          groupedLines.set(groupId, []);
+        }
+        groupedLines.get(groupId).push(line);
+      });
+      groupedLines.forEach(fitFixedWidthGroup);
     }
 
     function addLine(text = "", className = "") {
@@ -835,7 +852,6 @@
         line.textContent = text;
       }
       terminal.appendChild(line);
-      fitFixedWidthLine(line);
       scrollToBottom();
       return line;
     }
@@ -916,12 +932,20 @@
 
     async function showLines(lines, delay = 0, className = "", perLineClass = {}) {
       cursor.remove();
+      const shouldFitAsGroup = className.includes("table-ascii") || className.includes("logo-ascii");
+      const fitGroupId = shouldFitAsGroup ? `fit-group-${fixedWidthGroupCounter += 1}` : "";
+      const fittedLines = [];
 
       for (let index = 0; index < lines.length; index += 1) {
         const lineClass = Object.prototype.hasOwnProperty.call(perLineClass, index)
           ? perLineClass[index]
           : className;
-        addLine(lines[index], lineClass);
+        const line = addLine(lines[index], lineClass);
+        if (shouldFitAsGroup && lineClass === className) {
+          line.dataset.fitGroup = fitGroupId;
+          fittedLines.push(line);
+          fitFixedWidthGroup(fittedLines);
+        }
         if (delay > 0) {
           await wait(delay);
         }
