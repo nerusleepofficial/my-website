@@ -458,8 +458,8 @@
         const x = index * matrixFontSize;
         const y = matrixColumns[index] * matrixFontSize;
         matrixContext.fillStyle = Math.random() > 0.84
-          ? `rgba(210, 186, 242, ${0.18 + matrixIntensity * 0.22})`
-          : `rgba(132, 92, 176, ${0.1 + matrixIntensity * 0.2})`;
+          ? `rgba(210, 186, 242, ${0.28 + matrixIntensity * 0.32})`
+          : `rgba(132, 92, 176, ${0.2 + matrixIntensity * 0.3})`;
         matrixContext.fillText(glyph, x, y);
 
         if (y > window.innerHeight + matrixFontSize && Math.random() > 0.965) {
