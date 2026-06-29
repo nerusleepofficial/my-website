@@ -469,8 +469,8 @@
         const x = index * backgroundRainFontSize;
         const y = backgroundRainColumns[index] * backgroundRainFontSize;
         backgroundRainContext.fillStyle = Math.random() > 0.84
-          ? `rgba(210, 186, 242, ${0.18 + backgroundRainIntensity * 0.22})`
-          : `rgba(132, 92, 176, ${0.1 + backgroundRainIntensity * 0.2})`;
+          ? `rgba(210, 186, 242, ${0.28 + backgroundRainIntensity * 0.32})`
+          : `rgba(132, 92, 176, ${0.18 + backgroundRainIntensity * 0.28})`;
         backgroundRainContext.fillText(glyph, x, y);
 
         if (y > window.innerHeight + backgroundRainFontSize && Math.random() > 0.965) {
