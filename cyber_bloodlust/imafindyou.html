@@ -96,6 +96,17 @@
       text-shadow: none;
     }
 
+    .dim {
+      color: rgba(215, 215, 215, 0.48);
+      text-shadow: 0 0 8px rgba(215, 215, 215, 0.08);
+    }
+
+    .half-gap {
+      height: 0.72em;
+      min-height: 0.72em;
+      line-height: 0.72em;
+    }
+
     .error {
       color: var(--error);
       text-shadow: 0 0 12px rgba(255, 80, 80, 0.34);
@@ -263,7 +274,7 @@
       mix-blend-mode: screen;
     }
 
-    .matrix-rain {
+    .background-rain {
       pointer-events: none;
       position: fixed;
       inset: 0;
@@ -385,7 +396,7 @@
 <body>
   <div class="background-reveal" id="backgroundReveal" aria-hidden="true"></div>
   <div class="background-vignette" aria-hidden="true"></div>
-  <canvas class="matrix-rain" id="matrixRain" aria-hidden="true"></canvas>
+  <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
   <main class="screen" aria-label="Command prompt typing animation">
     <div class="terminal" id="terminal" aria-live="polite"></div>
   </main>
@@ -394,8 +405,8 @@
   <script>
     const terminal = document.querySelector("#terminal");
     const backgroundReveal = document.querySelector("#backgroundReveal");
-    const matrixCanvas = document.querySelector("#matrixRain");
-    const matrixContext = matrixCanvas.getContext("2d");
+    const backgroundRainCanvas = document.querySelector("#backgroundRain");
+    const backgroundRainContext = backgroundRainCanvas.getContext("2d");
     const cursor = document.createElement("span");
     cursor.className = "cursor";
     cursor.setAttribute("aria-hidden", "true");
@@ -406,31 +417,31 @@
       slow: { min: 105, max: 180, lineDelay: 520 }
     };
 
-    const matrixGlyphs = "01#$%&*+-/<>?=[]{}@ABCDEFGHIJKLMNOPQRSTUVWXYZ¥";
+    const backgroundGlyphs = "01#$%&*+-/<>?=[]{}@ABCDEFGHIJKLMNOPQRSTUVWXYZ¥";
     const preCursorGlyphs = "01#$%&*+-/<>?=[]{}@¥ZXCVBNM";
-    let matrixColumns = [];
-    let matrixColumnCount = 0;
-    let matrixFontSize = 16;
-    let matrixIntensity = 0.18;
+    let backgroundRainColumns = [];
+    let backgroundRainColumnCount = 0;
+    let backgroundRainFontSize = 16;
+    let backgroundRainIntensity = 0.18;
     let fixedWidthGroupCounter = 0;
 
-    function resizeMatrix() {
+    function resizeBackgroundRain() {
       const pixelRatio = window.devicePixelRatio || 1;
-      matrixCanvas.width = Math.floor(window.innerWidth * pixelRatio);
-      matrixCanvas.height = Math.floor(window.innerHeight * pixelRatio);
-      matrixCanvas.style.width = `${window.innerWidth}px`;
-      matrixCanvas.style.height = `${window.innerHeight}px`;
-      matrixContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      backgroundRainCanvas.width = Math.floor(window.innerWidth * pixelRatio);
+      backgroundRainCanvas.height = Math.floor(window.innerHeight * pixelRatio);
+      backgroundRainCanvas.style.width = `${window.innerWidth}px`;
+      backgroundRainCanvas.style.height = `${window.innerHeight}px`;
+      backgroundRainContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      matrixFontSize = Math.max(13, Math.min(18, Math.floor(window.innerWidth / 70)));
-      matrixColumnCount = Math.ceil(window.innerWidth / matrixFontSize);
-      matrixColumns = Array.from({ length: matrixColumnCount }, () => (
-        Math.floor(Math.random() * window.innerHeight / matrixFontSize)
+      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(window.innerWidth / 70)));
+      backgroundRainColumnCount = Math.ceil(window.innerWidth / backgroundRainFontSize);
+      backgroundRainColumns = Array.from({ length: backgroundRainColumnCount }, () => (
+        Math.floor(Math.random() * window.innerHeight / backgroundRainFontSize)
       ));
     }
 
-    function boostMatrix(amount = 0.34) {
-      matrixIntensity = Math.min(1, matrixIntensity + amount);
+    function boostBackgroundRain(amount = 0.34) {
+      backgroundRainIntensity = Math.min(1, backgroundRainIntensity + amount);
     }
 
     function randomNoiseText(maxLength = 3) {
@@ -444,38 +455,38 @@
       return text;
     }
 
-    function drawMatrix() {
-      matrixContext.fillStyle = `rgba(5, 5, 5, ${0.13 + matrixIntensity * 0.08})`;
-      matrixContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      matrixContext.font = `${matrixFontSize}px Consolas, "Courier New", monospace`;
+    function drawBackgroundRain() {
+      backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.13 + backgroundRainIntensity * 0.08})`;
+      backgroundRainContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
 
-      for (let index = 0; index < matrixColumnCount; index += 1) {
-        if (Math.random() > 0.32 + matrixIntensity * 0.52) {
+      for (let index = 0; index < backgroundRainColumnCount; index += 1) {
+        if (Math.random() > 0.32 + backgroundRainIntensity * 0.52) {
           continue;
         }
 
-        const glyph = matrixGlyphs[Math.floor(Math.random() * matrixGlyphs.length)];
-        const x = index * matrixFontSize;
-        const y = matrixColumns[index] * matrixFontSize;
-        matrixContext.fillStyle = Math.random() > 0.84
-          ? `rgba(210, 186, 242, ${0.28 + matrixIntensity * 0.32})`
-          : `rgba(132, 92, 176, ${0.2 + matrixIntensity * 0.3})`;
-        matrixContext.fillText(glyph, x, y);
+        const glyph = backgroundGlyphs[Math.floor(Math.random() * backgroundGlyphs.length)];
+        const x = index * backgroundRainFontSize;
+        const y = backgroundRainColumns[index] * backgroundRainFontSize;
+        backgroundRainContext.fillStyle = Math.random() > 0.84
+          ? `rgba(210, 186, 242, ${0.18 + backgroundRainIntensity * 0.22})`
+          : `rgba(132, 92, 176, ${0.1 + backgroundRainIntensity * 0.2})`;
+        backgroundRainContext.fillText(glyph, x, y);
 
-        if (y > window.innerHeight + matrixFontSize && Math.random() > 0.965) {
-          matrixColumns[index] = 0;
+        if (y > window.innerHeight + backgroundRainFontSize && Math.random() > 0.965) {
+          backgroundRainColumns[index] = 0;
         } else {
-          matrixColumns[index] += 1;
+          backgroundRainColumns[index] += 1;
         }
       }
 
-      matrixIntensity = Math.max(0.18, matrixIntensity * 0.965);
-      requestAnimationFrame(drawMatrix);
+      backgroundRainIntensity = Math.max(0.18, backgroundRainIntensity * 0.965);
+      requestAnimationFrame(drawBackgroundRain);
     }
 
-    resizeMatrix();
+    resizeBackgroundRain();
     window.addEventListener("resize", () => {
-      resizeMatrix();
+      resizeBackgroundRain();
       refitFixedWidthLines();
     });
     window.addEventListener("orientationchange", () => {
@@ -486,7 +497,7 @@
         window.setTimeout(refitFixedWidthLines, 80);
       });
     }
-    drawMatrix();
+    drawBackgroundRain();
 
     const introSequence = [
       { type: String.raw`C: \Users\You> cyber_bloodlust.exe` },
@@ -625,10 +636,10 @@
         "実行コマンドを復号してください。"
       ] },
       { blank: true },
-      { type: String.raw`C:\Users\You> load .\repair\charmap_pair.tbl`, speed: "fast" },
-      { type: "loading ENCRYPTED-VIEW.tbl...", speed: "fast" },
-      { type: "loading ASCII-VIEW.tbl...", speed: "fast" },
-      { type: "binding address map...", speed: "fast" },
+      { type: String.raw`C:\Users\You> load .\repair\charmap_pair.tbl`, speed: "fast", className: "dim" },
+      { type: "loading ENCRYPTED-VIEW.tbl...", speed: "fast", className: "dim" },
+      { type: "loading ASCII-VIEW.tbl...", speed: "fast", className: "dim" },
+      { type: "binding address map...", speed: "fast", className: "dim" },
       { blank: true },
       { instant: [
         "ENCRYPTED COMMAND: =x02",
@@ -637,6 +648,7 @@
       { instant: brokenViewTable, className: "ascii table-ascii" },
       { blank: true },
       { instant: asciiViewTable, className: "ascii table-ascii" },
+      { instant: [""], className: "half-gap" },
       { prompt: "HANG", maxLength: 4, validate: (value) => value.trim() === "HANG" }
     ];
 
@@ -658,8 +670,8 @@
         "復号済み命令を要求しています。"
       ] },
       { blank: true },
-      { type: String.raw`C:\Users\You> type .\dump\sector_02.enc`, speed: "fast" },
-      { type: String.raw`C:\Users\You> decrypt --manual`, speed: "fast" },
+      { type: String.raw`C:\Users\You> type .\dump\sector_02.enc`, speed: "fast", className: "dim" },
+      { type: String.raw`C:\Users\You> decrypt --manual`, speed: "fast", className: "dim" },
       { blank: true },
       { instant: [
         "[MODE] BACKWARD_SHIFT",
@@ -696,8 +708,8 @@
         "最終コマンドの復号には二重鍵XORを適用してください。"
       ] },
       { blank: true },
-      { type: String.raw`C:\Users\You> type .\dump\sector_03.bin`, speed: "fast" },
-      { type: String.raw`C:\Users\You> decrypt --manual`, speed: "fast" },
+      { type: String.raw`C:\Users\You> type .\dump\sector_03.bin`, speed: "fast", className: "dim" },
+      { type: String.raw`C:\Users\You> decrypt --manual`, speed: "fast", className: "dim" },
       { blank: true },
       { instant: [
         "[MODE] BINARY_XOR_DECRYPT",
@@ -870,13 +882,13 @@
         const flickers = speedName === "fast" ? 1 : 2 + Math.floor(Math.random() * 2);
         for (let index = 0; index < flickers; index += 1) {
           noise.textContent = randomNoiseText(speedName === "fast" ? 1 : 3);
-          boostMatrix(speedName === "fast" ? 0.12 : 0.22);
+          boostBackgroundRain(speedName === "fast" ? 0.12 : 0.22);
           await wait(speedName === "fast" ? 4 : 10 + Math.random() * 18);
         }
 
         noise.textContent = "";
         textNode.nodeValue += character;
-        boostMatrix(speedName === "fast" ? 0.18 : 0.28);
+        boostBackgroundRain(speedName === "fast" ? 0.18 : 0.28);
         scrollToBottom();
         await wait(randomDelay(speedName));
       }
@@ -908,7 +920,7 @@
           for (const { text, noise } of textNodes) {
             noise.textContent = index < text.length ? randomNoiseText(speedName === "fast" ? 1 : 2) : "";
           }
-          boostMatrix(speedName === "fast" ? 0.14 : 0.26);
+          boostBackgroundRain(speedName === "fast" ? 0.14 : 0.26);
           await wait(speedName === "fast" ? 4 : 12);
         }
 
@@ -918,7 +930,7 @@
             textNode.nodeValue += text[index];
           }
         }
-        boostMatrix(speedName === "fast" ? 0.24 : 0.36);
+        boostBackgroundRain(speedName === "fast" ? 0.24 : 0.36);
         scrollToBottom();
         await wait(randomDelay(speedName));
       }
