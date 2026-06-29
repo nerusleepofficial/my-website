@@ -91,6 +91,11 @@
       overflow-wrap: anywhere;
     }
 
+    .axis-label {
+      color: rgba(215, 215, 215, 0.42);
+      text-shadow: none;
+    }
+
     .error {
       color: var(--error);
       text-shadow: 0 0 12px rgba(255, 80, 80, 0.34);
@@ -477,19 +482,19 @@
     const brokenViewTable = [
       "ENCRYPTED-VIEW",
       "",
-      "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F",
-      "0x30  z  8  @  m  -  T  4  #  R  u  ]  c  5  N  *  s",
-      "0x40  ~  x  7  $  q  +  V  2  =  ?  e  %  !  a  0  /",
-      "0x50  G  h  3  &  p  Y  ,  F  6  w  [  d  ;  M  _  r"
+      { html: '<span class="axis-label">   A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P</span>' },
+      { html: '<span class="axis-label">1</span>  z  8  @  m  -  T  4  #  R  u  ]  c  5  N  *  s' },
+      { html: '<span class="axis-label">2</span>  ~  x  7  $  q  +  V  2  =  ?  e  %  !  a  0  /' },
+      { html: '<span class="axis-label">3</span>  G  h  3  &  p  Y  ,  F  6  w  [  d  ;  M  _  r' }
     ];
 
     const asciiViewTable = [
       "ASCII-VIEW",
       "",
-      "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F",
-      "0x30  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?",
-      "0x40  @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O",
-      String.raw`0x50  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _`
+      { html: '<span class="axis-label">   A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P</span>' },
+      { html: '<span class="axis-label">1</span>  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?' },
+      { html: '<span class="axis-label">2</span>  @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O' },
+      { html: String.raw`<span class="axis-label">3</span>  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _` }
     ];
 
     const hangHints = {
@@ -767,7 +772,11 @@
       if (className) {
         line.classList.add(...className.split(" ").filter(Boolean));
       }
-      line.textContent = text;
+      if (typeof text === "object" && text.html) {
+        line.innerHTML = text.html;
+      } else {
+        line.textContent = text;
+      }
       terminal.appendChild(line);
       scrollToBottom();
       return line;
