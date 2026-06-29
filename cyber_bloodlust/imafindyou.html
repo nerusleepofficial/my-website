@@ -298,7 +298,7 @@
       }
 
       .line,
-      .ascii:not(.logo-ascii) {
+      .ascii:not(.logo-ascii):not(.table-ascii) {
         max-width: 100%;
         white-space: normal;
         overflow-wrap: anywhere;
@@ -341,6 +341,14 @@
       .logo-ascii {
         font-size: clamp(5px, 1.42vw, 8px);
         line-height: 1.02;
+        white-space: pre;
+        overflow-wrap: normal;
+        word-break: normal;
+      }
+
+      .table-ascii {
+        font-size: clamp(5px, 1.55vw, 8px);
+        line-height: 1.12;
         white-space: pre;
         overflow-wrap: normal;
         word-break: normal;
@@ -588,9 +596,9 @@
         "ENCRYPTED COMMAND: =x02",
         ""
       ] },
-      { instant: brokenViewTable, className: "ascii" },
+      { instant: brokenViewTable, className: "ascii table-ascii" },
       { blank: true },
-      { instant: asciiViewTable, className: "ascii" },
+      { instant: asciiViewTable, className: "ascii table-ascii" },
       { prompt: "HANG", maxLength: 4, validate: (value) => value.trim() === "HANG" }
     ];
 
