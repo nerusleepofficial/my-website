@@ -365,7 +365,7 @@
       }
 
       .logo-ascii {
-        font-size: clamp(5px, 1.54vw, 6px);
+        font-size: clamp(8px, 2.72vw, 11px);
         line-height: 1.02;
         white-space: pre;
         overflow-wrap: normal;
@@ -373,7 +373,7 @@
       }
 
       .table-ascii {
-        font-size: clamp(6px, 1.95vw, 9px);
+        font-size: clamp(9px, 3.2vw, 13px);
         line-height: 1.12;
         white-space: pre;
         overflow-wrap: normal;
@@ -473,7 +473,18 @@
     }
 
     resizeMatrix();
-    window.addEventListener("resize", resizeMatrix);
+    window.addEventListener("resize", () => {
+      resizeMatrix();
+      refitFixedWidthLines();
+    });
+    window.addEventListener("orientationchange", () => {
+      window.setTimeout(refitFixedWidthLines, 220);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", () => {
+        window.setTimeout(refitFixedWidthLines, 80);
+      });
+    }
     drawMatrix();
 
     const introSequence = [
@@ -791,6 +802,27 @@
       terminal.scrollTo({ top: terminal.scrollHeight });
     }
 
+    function fitFixedWidthLine(line) {
+      if (!line.classList.contains("table-ascii") && !line.classList.contains("logo-ascii")) {
+        return;
+      }
+      line.style.fontSize = "";
+      const availableWidth = terminal.clientWidth - 2;
+      if (line.scrollWidth <= availableWidth) {
+        return;
+      }
+      const currentSize = parseFloat(getComputedStyle(line).fontSize);
+      if (!currentSize) {
+        return;
+      }
+      const scale = Math.max(0.62, availableWidth / line.scrollWidth);
+      line.style.fontSize = `${currentSize * scale}px`;
+    }
+
+    function refitFixedWidthLines() {
+      terminal.querySelectorAll(".table-ascii, .logo-ascii").forEach(fitFixedWidthLine);
+    }
+
     function addLine(text = "", className = "") {
       const line = document.createElement("div");
       line.className = "line";
@@ -803,6 +835,7 @@
         line.textContent = text;
       }
       terminal.appendChild(line);
+      fitFixedWidthLine(line);
       scrollToBottom();
       return line;
     }
