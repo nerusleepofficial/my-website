@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>cmd typing</title>
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no, url=no">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <title>ＩＭＡ　ＦＩＮＤ　ＹＯＵ</title>
   <style>
     :root {
       color-scheme: dark;
@@ -20,39 +22,55 @@
       box-sizing: border-box;
     }
 
+    html {
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
+      height: 100%;
       min-height: 100vh;
+      min-height: 100dvh;
       background:
         radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.035), transparent 38%),
         var(--bg);
       color: var(--text);
       font-family: Consolas, "Lucida Console", "Courier New", monospace;
-      overflow: auto;
+      overflow: hidden;
     }
 
     .screen {
       position: relative;
       z-index: 4;
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
       padding: clamp(18px, 4vw, 46px);
       display: flex;
       align-items: flex-start;
+      overflow: hidden;
     }
 
     .terminal {
       width: 100%;
+      height: 100%;
       max-width: 1180px;
       line-height: 1.45;
       font-size: clamp(14px, 1.85vw, 22px);
       text-shadow: 0 0 10px rgba(215, 215, 215, 0.18);
-      white-space: pre;
-      overflow-x: auto;
-      overflow-y: visible;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-bottom: 12vh;
     }
 
     .line {
       min-height: 1.45em;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .ascii {
@@ -60,7 +78,8 @@
       line-height: 1.08;
       letter-spacing: 0;
       min-height: 1.08em;
-      white-space: pre;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     .error {
@@ -118,7 +137,9 @@
       color: rgba(215, 215, 215, 0.82);
       font-size: 0.78em;
       line-height: 1.35;
-      white-space: pre;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .prompt-input {
@@ -242,6 +263,47 @@
       }
       49%, 100% {
         opacity: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .screen {
+        padding: 14px;
+      }
+
+      .terminal {
+        font-size: 13px;
+        line-height: 1.42;
+        padding-bottom: 16vh;
+      }
+
+      .prompt-form {
+        gap: 0.45em;
+      }
+
+      .prompt-input {
+        width: min(15ch, 52vw);
+      }
+
+      .send-button {
+        padding: 0.26em 0.48em;
+      }
+
+      .prompt-tools span {
+        display: inline-block;
+        margin-bottom: 0.2em;
+      }
+
+      .prompt-tools span + span {
+        margin-left: 0.95em;
+      }
+
+      .logo-ascii {
+        font-size: clamp(5px, 1.42vw, 8px);
+        line-height: 1.02;
+        white-space: pre;
+        overflow-wrap: normal;
+        word-break: normal;
       }
     }
   </style>
@@ -615,7 +677,7 @@
     const openSequence = [
       { blank: true },
       { pause: 1000 },
-      { showLines: logoBlock, delay: 110, className: "ascii" },
+      { showLines: logoBlock, delay: 110, className: "ascii logo-ascii" },
       { blank: true },
       { pause: 1000 },
       { type: "ＷＥＬＣＯＭＥ　ＴＯ　ＴＨＥ　ＯＴＨＥＲ　ＷＯＲＬＤ", className: "crimson", speed: "slow" },
@@ -648,7 +710,7 @@
     }
 
     function scrollToBottom() {
-      window.scrollTo({ top: document.documentElement.scrollHeight });
+      terminal.scrollTo({ top: terminal.scrollHeight });
     }
 
     function addLine(text = "", className = "") {
