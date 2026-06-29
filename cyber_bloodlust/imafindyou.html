@@ -148,7 +148,28 @@
       letter-spacing: 0;
     }
 
-    .prompt-tools span + span {
+    .hint-button {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      line-height: inherit;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: none;
+      text-shadow: inherit;
+    }
+
+    .hint-button:hover,
+    .hint-button:focus-visible {
+      color: rgba(215, 215, 215, 0.86);
+      outline: 0;
+      text-decoration: underline;
+      text-underline-offset: 0.18em;
+    }
+
+    .hint-button + .hint-button {
       margin-left: 1.4em;
     }
 
@@ -334,17 +355,17 @@
         padding: 0.26em 0.48em;
       }
 
-      .prompt-tools span {
+      .hint-button {
         display: inline-block;
         margin-bottom: 0.2em;
       }
 
-      .prompt-tools span + span {
+      .hint-button + .hint-button {
         margin-left: 0.95em;
       }
 
       .logo-ascii {
-        font-size: clamp(5px, 1.42vw, 8px);
+        font-size: clamp(5px, 1.54vw, 6px);
         line-height: 1.02;
         white-space: pre;
         overflow-wrap: normal;
@@ -352,7 +373,7 @@
       }
 
       .table-ascii {
-        font-size: clamp(5px, 1.55vw, 8px);
+        font-size: clamp(6px, 1.95vw, 9px);
         line-height: 1.12;
         white-space: pre;
         overflow-wrap: normal;
@@ -672,7 +693,11 @@
         "DECRYPT = ENCRYPTED XOR KEY_01 XOR KEY_02",
         "復号 = 暗号文 XOR 第1鍵 XOR 第2鍵",
         "",
-        "ENCRYPTED BIN: 01000001 01011101 01010000 01000101",
+        "ENCRYPTED BIN:",
+        "01000001",
+        "01011101",
+        "01010000",
+        "01000101",
         "KEY_01: H A N G",
         "KEY_02: B U R N"
       ] },
@@ -890,15 +915,10 @@
       cursor.remove();
 
       let hintAnswer;
+      let hintTools;
       if (item.hints) {
-        const hintTools = document.createElement("div");
+        hintTools = document.createElement("div");
         hintTools.className = "prompt-tools";
-
-        Object.keys(item.hints).forEach((label) => {
-          const hintLabel = document.createElement("span");
-          hintLabel.textContent = label;
-          hintTools.appendChild(hintLabel);
-        });
 
         hintAnswer = document.createElement("div");
         hintAnswer.className = "hint-answer";
@@ -919,6 +939,20 @@
       input.spellcheck = false;
       input.maxLength = item.maxLength || 1;
       input.setAttribute("aria-label", item.prompt);
+
+      if (item.hints) {
+        Object.keys(item.hints).forEach((label) => {
+          const hintButton = document.createElement("button");
+          hintButton.className = "hint-button";
+          hintButton.type = "button";
+          hintButton.textContent = label;
+          hintButton.addEventListener("click", () => {
+            input.value = label;
+            input.focus();
+          });
+          hintTools.appendChild(hintButton);
+        });
+      }
 
       const button = document.createElement("button");
       button.className = "send-button";
