@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no, url=no">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <title>ＦＯＲＳＡＫＥＮ　ＣＨＩＬＤ</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050505;
+      --text: #d8d4dc;
+      --purple: #a97bd6;
+      --red: #aa1630;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(178, 126, 220, 0.075), transparent 38%),
+        radial-gradient(circle at 80% 18%, rgba(176, 0, 32, 0.06), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family: Consolas, "Lucida Console", "Courier New", monospace;
+    }
+
+    .background-rain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      opacity: 0.72;
+      mix-blend-mode: screen;
+    }
+
+    .background-vignette {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(100, 62, 135, 0.14), transparent 34%),
+        linear-gradient(90deg, rgba(5, 5, 5, 0.52), rgba(5, 5, 5, 0.12) 48%, rgba(5, 5, 5, 0.52)),
+        linear-gradient(rgba(5, 5, 5, 0.08), rgba(5, 5, 5, 0.58));
+    }
+
+    .scanlines {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.026) 0,
+        rgba(255, 255, 255, 0.026) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+    }
+
+    .screen {
+      position: relative;
+      z-index: 4;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      padding: clamp(18px, 4vw, 46px);
+    }
+
+    .page {
+      width: 100%;
+      max-width: 860px;
+      height: 100%;
+      margin: 0 auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: clamp(10px, 2vw, 24px) 0 18vh;
+      text-shadow: 0 0 12px rgba(216, 212, 220, 0.18);
+    }
+
+    .header-art {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(9px, 2.4vw, 22px);
+      max-width: 100%;
+      margin: 0 auto clamp(28px, 5vw, 46px);
+      filter:
+        drop-shadow(0 0 14px rgba(169, 123, 214, 0.26))
+        drop-shadow(0 0 24px rgba(170, 22, 48, 0.16));
+    }
+
+    .statue {
+      flex: 0 1 auto;
+      width: clamp(34px, 8vw, 50px);
+      height: auto;
+      min-width: 0;
+    }
+
+    .header-logo {
+      flex: 0 1 572px;
+      width: min(72vw, 572px);
+      height: auto;
+      min-width: 0;
+    }
+
+    .poem {
+      width: min(100%, 42ch);
+      margin: 0 auto;
+      font-size: clamp(15px, 2.1vw, 20px);
+      line-height: 1.62;
+      letter-spacing: 0;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .poem-title,
+    .mirror {
+      color: rgba(224, 217, 230, 0.96);
+      text-shadow:
+        0 0 12px rgba(216, 212, 220, 0.26),
+        0 0 28px rgba(169, 123, 214, 0.18);
+    }
+
+    .quiet,
+    .place {
+      color: rgba(202, 180, 232, 0.86);
+      text-shadow: 0 0 14px rgba(169, 123, 214, 0.22);
+    }
+
+    .alone {
+      color: rgba(255, 92, 116, 0.86);
+      text-shadow: 0 0 14px rgba(176, 0, 32, 0.32);
+    }
+
+    .translation {
+      display: block;
+      color: rgba(216, 212, 220, 0.48);
+      font-size: 0.86em;
+      line-height: 1.38;
+      text-shadow: 0 0 8px rgba(216, 212, 220, 0.08);
+    }
+
+    .middle-art,
+    .ending-art {
+      display: block;
+      height: auto;
+      margin: clamp(20px, 5vw, 38px) auto;
+      filter:
+        drop-shadow(0 0 13px rgba(169, 123, 214, 0.28))
+        drop-shadow(0 0 24px rgba(170, 22, 48, 0.14));
+    }
+
+    .cat-art {
+      width: min(32vw, 116px);
+      min-width: 86px;
+    }
+
+    .computer-art {
+      width: min(58vw, 222px);
+      min-width: 150px;
+    }
+
+    .ending-art {
+      width: min(50vw, 266px);
+      min-width: 156px;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 640px) {
+      .screen {
+        padding: 14px;
+        touch-action: pan-y;
+      }
+
+      .page {
+        max-width: 100%;
+        padding-bottom: 20vh;
+      }
+
+      .header-art {
+        gap: 8px;
+        margin-bottom: 30px;
+      }
+
+      .statue {
+        width: min(12vw, 42px);
+      }
+
+      .header-logo {
+        width: min(70vw, 330px);
+      }
+
+      .poem {
+        width: min(100%, 34ch);
+        font-size: clamp(14px, 4.1vw, 17px);
+        line-height: 1.58;
+      }
+
+      .cat-art {
+        width: min(36vw, 112px);
+        min-width: 86px;
+      }
+
+      .computer-art {
+        width: min(68vw, 222px);
+      }
+
+      .ending-art {
+        width: min(64vw, 240px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
+  <div class="background-vignette" aria-hidden="true"></div>
+  <main class="screen" aria-label="Forsaken child">
+    <article class="page">
+      <div class="header-art" aria-hidden="true">
+        <img class="statue" src="./assets/forsaken_child/statue.gif" alt="">
+        <img class="header-logo" src="./assets/forsaken_child/logo05.gif" alt="">
+        <img class="statue" src="./assets/forsaken_child/statue.gif" alt="">
+      </div>
+
+      <div class="poem"><span class="poem-title">That child again</span>
+<span class="translation">またあの子だ</span>
+
+No place to return
+<span class="translation">帰る場所もない</span>
+No place to want to return
+<span class="translation">帰りたい場所がない</span>
+
+In the corner of the classroom
+<span class="translation">教室の隅で</span>
+tracing the grooves in the floor
+<span class="translation">床の溝をなぞっている</span>
+
+Breathing quietly
+<span class="translation">静かに息をして</span>
+trying not to be in the way
+<span class="translation">邪魔にならないように</span>
+
+The world, maybe
+<span class="translation">この世界は多分</span>
+never knew
+<span class="translation">知らなかった</span>
+where to put that child
+<span class="translation">あの子を置くべき場所を</span>
+
+So it placed them
+<span class="translation">だから置いた</span>
+by the window
+<span class="translation">窓の側に</span>
+
+Placed them
+<span class="translation">だから置いた</span>
+on the rooftop
+<span class="translation">屋上に</span>
+
+Placed them
+<span class="translation">だから置いた</span>
+inside the silence
+<span class="translation">静寂の中に</span>
+
+Told them to stay there
+<span class="translation">そこに居なさいと言って</span>
+until Mom or Dad
+<span class="translation">ママかパパが</span>
+came to pick them up
+<span class="translation">お迎えに来るまで</span>
+
+<span class="alone">And no one came</span>
+<span class="translation">結局、誰も迎えに来なかった</span></div>
+
+      <img class="middle-art cat-art" src="./assets/forsaken_child/cat.gif" alt="">
+
+      <div class="poem">That child
+<span class="translation">あの子は</span>
+was crying the wrong way
+<span class="translation">泣き方を間違えていた</span>
+
+Too quiet
+<span class="translation">静か過ぎた</span>
+to ask for help
+<span class="translation">助けを求めるには</span>
+
+Saying I’m okay
+<span class="translation">大丈夫って言いながら</span>
+Breaking day by day
+<span class="translation">日に日に壊れていく</span>
+
+Not disappearing
+<span class="translation">消えるんじゃない</span>
+Rotting
+<span class="translation">腐る</span>
+
+Somewhere unseen
+<span class="translation">誰も知らないようなところで</span>
+Quietly
+<span class="translation">静かに</span>
+Slowly
+<span class="translation">ゆっくりと</span>
+
+Melting into
+<span class="translation">溶けていく</span>
+the shape of today
+<span class="translation">今日の形へと</span>
+
+That child
+<span class="translation">あの子は</span>
+is still somewhere
+<span class="translation">まだどこかにいる</span>
+
+Beyond the closed school gate
+<span class="translation">閉まった校門の先で</span>
+
+In the evening classroom
+<span class="translation">誰にも名前を呼ばれなかった</span>
+where no one called their name
+<span class="translation">夕暮れの教室で</span>
+
+Still
+<span class="translation">今も</span>
+Looking this way
+<span class="translation">こちらを見つめている</span></div>
+
+      <img class="middle-art computer-art" src="./assets/forsaken_child/computer.gif" alt="">
+
+      <div class="poem"><span class="poem-title">Forsaken child</span>
+<span class="translation">捨てられた子</span>
+
+But it wasn’t only
+<span class="translation">でも</span>
+the world that abandoned them
+<span class="translation">捨てたのは世界だけじゃない</span>
+
+Before anyone else
+<span class="translation">誰よりも先に</span>
+
+There was someone
+<span class="translation">その手を離した</span>
+who let go of that hand
+<span class="translation">誰かがいる</span>
+
+And now
+<span class="translation">今や</span>
+
+The face of that child is known
+<span class="translation">あの子の顔を知っているのは</span>
+
+<span class="alone">Only by the mirror</span>
+<span class="translation">鏡だけだ</span></div>
+
+      <img class="ending-art" src="./assets/forsaken_child/apple.gif" alt="">
+    </article>
+  </main>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <script>
+    const backgroundRainCanvas = document.querySelector("#backgroundRain");
+    const backgroundRainContext = backgroundRainCanvas.getContext("2d");
+    const backgroundGlyphs = "01#$%&*+-/<>?=[]{}@ABCDEFGHIJKLMNOPQRSTUVWXYZ¥";
+    let backgroundRainColumns = [];
+    let backgroundRainColumnCount = 0;
+    let backgroundRainFontSize = 16;
+    let backgroundRainIntensity = 0.72;
+
+    function resizeBackgroundRain() {
+      const pixelRatio = window.devicePixelRatio || 1;
+      backgroundRainCanvas.width = Math.floor(window.innerWidth * pixelRatio);
+      backgroundRainCanvas.height = Math.floor(window.innerHeight * pixelRatio);
+      backgroundRainCanvas.style.width = `${window.innerWidth}px`;
+      backgroundRainCanvas.style.height = `${window.innerHeight}px`;
+      backgroundRainContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(window.innerWidth / 70)));
+      backgroundRainColumnCount = Math.ceil(window.innerWidth / backgroundRainFontSize);
+      backgroundRainColumns = Array.from({ length: backgroundRainColumnCount }, () => (
+        Math.floor(Math.random() * window.innerHeight / backgroundRainFontSize)
+      ));
+    }
+
+    function drawBackgroundRain() {
+      backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.095 + backgroundRainIntensity * 0.045})`;
+      backgroundRainContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
+
+      for (let index = 0; index < backgroundRainColumnCount; index += 1) {
+        if (Math.random() > 0.48 + backgroundRainIntensity * 0.32) {
+          continue;
+        }
+
+        const glyph = backgroundGlyphs[Math.floor(Math.random() * backgroundGlyphs.length)];
+        const x = index * backgroundRainFontSize;
+        const y = backgroundRainColumns[index] * backgroundRainFontSize;
+        backgroundRainContext.fillStyle = Math.random() > 0.84
+          ? `rgba(210, 186, 242, ${0.32 + backgroundRainIntensity * 0.34})`
+          : `rgba(132, 92, 176, ${0.21 + backgroundRainIntensity * 0.28})`;
+        backgroundRainContext.fillText(glyph, x, y);
+
+        if (y > window.innerHeight + backgroundRainFontSize && Math.random() > 0.965) {
+          backgroundRainColumns[index] = 0;
+        } else {
+          backgroundRainColumns[index] += 1;
+        }
+      }
+
+      backgroundRainIntensity = Math.max(0.68, backgroundRainIntensity * 0.99);
+      requestAnimationFrame(drawBackgroundRain);
+    }
+
+    resizeBackgroundRain();
+    window.addEventListener("resize", resizeBackgroundRain);
+    drawBackgroundRain();
+  </script>
+</body>
+</html>
