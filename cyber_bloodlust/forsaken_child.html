@@ -231,6 +231,95 @@
         inset -1px -1px 0 #808080;
     }
 
+    .mobile-win98-scrollbar {
+      display: none;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      bottom: 4px;
+      z-index: 8;
+      width: 16px;
+      flex-direction: column;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      pointer-events: auto;
+    }
+
+    .mobile-win98-scrollbar.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-win98-scrollbar-button {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      display: grid;
+      place-items: center;
+      color: #000000;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      font-family: Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1;
+    }
+
+    .mobile-win98-scrollbar-track {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 24px;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          #d7d7d7 0,
+          #d7d7d7 2px,
+          #b7b7b7 2px,
+          #b7b7b7 4px
+        );
+      border-left: 1px solid #808080;
+      border-right: 1px solid #ffffff;
+      overflow: hidden;
+    }
+
+    .mobile-win98-scrollbar-thumb {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 28px;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      transform: translateY(0);
+    }
+
+    @media (hover: none), (pointer: coarse), (max-width: 768px) {
+      .mobile-win98-scrollbar {
+        display: flex;
+      }
+
+      .page {
+        padding-right: 20px;
+        scrollbar-width: none;
+      }
+
+      .page::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+    }
+
     .header-art {
       display: flex;
       align-items: center;
@@ -599,11 +688,68 @@ The face of that child is known
       requestAnimationFrame(drawBackgroundRain);
     }
 
+    function installMobileWin98Scrollbar(scrollElement) {
+      const host = scrollElement.closest(".win98-content");
+      if (!host || host.querySelector(".mobile-win98-scrollbar")) {
+        return;
+      }
+
+      const scrollbar = document.createElement("div");
+      scrollbar.className = "mobile-win98-scrollbar is-hidden";
+      scrollbar.setAttribute("aria-hidden", "true");
+      scrollbar.innerHTML = `
+        <button class="mobile-win98-scrollbar-button" type="button" tabindex="-1">▲</button>
+        <div class="mobile-win98-scrollbar-track">
+          <div class="mobile-win98-scrollbar-thumb"></div>
+        </div>
+        <button class="mobile-win98-scrollbar-button" type="button" tabindex="-1">▼</button>
+      `;
+      host.appendChild(scrollbar);
+
+      const [upButton, downButton] = scrollbar.querySelectorAll(".mobile-win98-scrollbar-button");
+      const track = scrollbar.querySelector(".mobile-win98-scrollbar-track");
+      const thumb = scrollbar.querySelector(".mobile-win98-scrollbar-thumb");
+
+      function updateMobileScrollbar() {
+        const maxScroll = scrollElement.scrollHeight - scrollElement.clientHeight;
+        if (maxScroll <= 1) {
+          scrollbar.classList.add("is-hidden");
+          return;
+        }
+
+        scrollbar.classList.remove("is-hidden");
+        const trackHeight = Math.max(1, track.clientHeight);
+        const thumbHeight = Math.min(
+          trackHeight,
+          Math.max(28, Math.round(trackHeight * scrollElement.clientHeight / scrollElement.scrollHeight))
+        );
+        const travel = Math.max(0, trackHeight - thumbHeight);
+        const thumbTop = Math.round((scrollElement.scrollTop / maxScroll) * travel);
+        thumb.style.height = `${thumbHeight}px`;
+        thumb.style.transform = `translateY(${thumbTop}px)`;
+      }
+
+      upButton.addEventListener("click", () => {
+        scrollElement.scrollBy({ top: -scrollElement.clientHeight * 0.85, behavior: "smooth" });
+      });
+      downButton.addEventListener("click", () => {
+        scrollElement.scrollBy({ top: scrollElement.clientHeight * 0.85, behavior: "smooth" });
+      });
+      scrollElement.addEventListener("scroll", updateMobileScrollbar, { passive: true });
+      window.addEventListener("resize", updateMobileScrollbar);
+      window.addEventListener("orientationchange", () => setTimeout(updateMobileScrollbar, 240));
+      if (window.ResizeObserver) {
+        new ResizeObserver(updateMobileScrollbar).observe(scrollElement);
+      }
+      setTimeout(updateMobileScrollbar, 0);
+    }
+
     resizeBackgroundRain();
     window.addEventListener("resize", resizeBackgroundRain);
     if (window.ResizeObserver) {
       new ResizeObserver(resizeBackgroundRain).observe(backgroundRainCanvas.parentElement);
     }
+    installMobileWin98Scrollbar(document.querySelector(".page"));
     drawBackgroundRain();
   </script>
 </body>
