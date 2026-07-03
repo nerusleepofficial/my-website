@@ -45,7 +45,7 @@
 
     .background-rain {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 1;
       opacity: 0.72;
@@ -54,7 +54,7 @@
 
     .background-vignette {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 2;
       background:
@@ -65,9 +65,9 @@
 
     .scanlines {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
-      z-index: 5;
+      z-index: 4;
       opacity: 0.35;
       mix-blend-mode: screen;
       background: repeating-linear-gradient(
@@ -184,6 +184,7 @@
       min-height: 0;
       margin: 0 4px 4px;
       padding: clamp(10px, 1.6vw, 20px);
+      position: relative;
       background: transparent;
       border: 2px solid;
       border-color: #404040 #ffffff #ffffff #404040;
@@ -194,6 +195,8 @@
     }
 
     .page {
+      position: relative;
+      z-index: 3;
       width: 100%;
       max-width: 860px;
       height: 100%;
@@ -364,8 +367,6 @@
   </style>
 </head>
 <body>
-  <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
-  <div class="background-vignette" aria-hidden="true"></div>
   <main class="screen" aria-label="Forsaken child">
     <section class="win98-window" aria-label="Windows 98 page frame">
       <div class="win98-titlebar" aria-hidden="true">
@@ -380,6 +381,8 @@
         </span>
       </div>
       <div class="win98-content">
+        <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
+        <div class="background-vignette" aria-hidden="true"></div>
         <article class="page">
           <div class="header-art" aria-hidden="true">
             <img class="statue" src="./assets/forsaken_child/statue.gif" alt="">
@@ -506,10 +509,10 @@ The face of that child is known
 
       <img class="ending-art" src="./assets/forsaken_child/apple.gif" alt="">
         </article>
+        <div class="scanlines" aria-hidden="true"></div>
       </div>
     </section>
   </main>
-  <div class="scanlines" aria-hidden="true"></div>
 
   <script>
     const backgroundRainCanvas = document.querySelector("#backgroundRain");
@@ -520,24 +523,34 @@ The face of that child is known
     let backgroundRainFontSize = 16;
     let backgroundRainIntensity = 0.72;
 
+    function getBackgroundRainSize() {
+      const bounds = backgroundRainCanvas.parentElement.getBoundingClientRect();
+      return {
+        width: Math.max(1, Math.floor(bounds.width)),
+        height: Math.max(1, Math.floor(bounds.height))
+      };
+    }
+
     function resizeBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
       const pixelRatio = window.devicePixelRatio || 1;
-      backgroundRainCanvas.width = Math.floor(window.innerWidth * pixelRatio);
-      backgroundRainCanvas.height = Math.floor(window.innerHeight * pixelRatio);
-      backgroundRainCanvas.style.width = `${window.innerWidth}px`;
-      backgroundRainCanvas.style.height = `${window.innerHeight}px`;
+      backgroundRainCanvas.width = Math.floor(width * pixelRatio);
+      backgroundRainCanvas.height = Math.floor(height * pixelRatio);
+      backgroundRainCanvas.style.width = `${width}px`;
+      backgroundRainCanvas.style.height = `${height}px`;
       backgroundRainContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(window.innerWidth / 70)));
-      backgroundRainColumnCount = Math.ceil(window.innerWidth / backgroundRainFontSize);
+      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(width / 70)));
+      backgroundRainColumnCount = Math.ceil(width / backgroundRainFontSize);
       backgroundRainColumns = Array.from({ length: backgroundRainColumnCount }, () => (
-        Math.floor(Math.random() * window.innerHeight / backgroundRainFontSize)
+        Math.floor(Math.random() * height / backgroundRainFontSize)
       ));
     }
 
     function drawBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
       backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.095 + backgroundRainIntensity * 0.045})`;
-      backgroundRainContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      backgroundRainContext.fillRect(0, 0, width, height);
       backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
 
       for (let index = 0; index < backgroundRainColumnCount; index += 1) {
@@ -553,7 +566,7 @@ The face of that child is known
           : `rgba(132, 92, 176, ${0.21 + backgroundRainIntensity * 0.28})`;
         backgroundRainContext.fillText(glyph, x, y);
 
-        if (y > window.innerHeight + backgroundRainFontSize && Math.random() > 0.965) {
+        if (y > height + backgroundRainFontSize && Math.random() > 0.965) {
           backgroundRainColumns[index] = 0;
         } else {
           backgroundRainColumns[index] += 1;
@@ -566,6 +579,9 @@ The face of that child is known
 
     resizeBackgroundRain();
     window.addEventListener("resize", resizeBackgroundRain);
+    if (window.ResizeObserver) {
+      new ResizeObserver(resizeBackgroundRain).observe(backgroundRainCanvas.parentElement);
+    }
     drawBackgroundRain();
   </script>
 </body>
