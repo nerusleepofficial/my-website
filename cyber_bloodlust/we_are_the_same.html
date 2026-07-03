@@ -156,10 +156,13 @@
     }
 
     .win98-button {
+      position: relative;
       width: 18px;
       height: 16px;
       display: grid;
       place-items: center;
+      margin: 0;
+      padding: 0;
       background: #c0c0c0;
       border: 1px solid;
       border-color: #ffffff #404040 #404040 #ffffff;
@@ -168,14 +171,48 @@
         inset -1px -1px 0 #808080;
       color: #000000;
       font-family: Arial, sans-serif;
-      font-size: 12px;
+      font-size: 0;
       font-weight: 700;
       line-height: 1;
     }
 
-    .win98-button.minimize {
-      align-items: end;
-      padding-bottom: 2px;
+    .win98-button::before,
+    .win98-button::after {
+      content: "";
+      position: absolute;
+      display: block;
+    }
+
+    .win98-button.minimize::before {
+      left: 4px;
+      right: 4px;
+      bottom: 3px;
+      height: 2px;
+      background: #000000;
+    }
+
+    .win98-button.maximize::before {
+      width: 8px;
+      height: 7px;
+      top: 50%;
+      left: 50%;
+      box-sizing: border-box;
+      border: 2px solid #000000;
+      transform: translate(-50%, -50%);
+    }
+
+    .win98-button.close::before,
+    .win98-button.close::after {
+      width: 10px;
+      height: 2px;
+      top: 50%;
+      left: 50%;
+      background: #000000;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .win98-button.close::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     .win98-content {
@@ -497,8 +534,8 @@
         </span>
         <span class="win98-buttons">
           <span class="win98-button minimize">_</span>
-          <span class="win98-button">□</span>
-          <span class="win98-button">×</span>
+          <span class="win98-button maximize">□</span>
+          <span class="win98-button close">×</span>
         </span>
       </div>
       <div class="win98-content">

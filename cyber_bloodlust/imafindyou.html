@@ -123,10 +123,13 @@
     }
 
     .win98-button {
+      position: relative;
       width: 18px;
       height: 16px;
       display: grid;
       place-items: center;
+      margin: 0;
+      padding: 0;
       background: #c0c0c0;
       border: 1px solid;
       border-color: #ffffff #404040 #404040 #ffffff;
@@ -135,14 +138,48 @@
         inset -1px -1px 0 #808080;
       color: #000000;
       font-family: Arial, sans-serif;
-      font-size: 12px;
+      font-size: 0;
       font-weight: 700;
       line-height: 1;
     }
 
-    .win98-button.minimize {
-      align-items: end;
-      padding-bottom: 2px;
+    .win98-button::before,
+    .win98-button::after {
+      content: "";
+      position: absolute;
+      display: block;
+    }
+
+    .win98-button.minimize::before {
+      left: 4px;
+      right: 4px;
+      bottom: 3px;
+      height: 2px;
+      background: #000000;
+    }
+
+    .win98-button.maximize::before {
+      width: 8px;
+      height: 7px;
+      top: 50%;
+      left: 50%;
+      box-sizing: border-box;
+      border: 2px solid #000000;
+      transform: translate(-50%, -50%);
+    }
+
+    .win98-button.close::before,
+    .win98-button.close::after {
+      width: 10px;
+      height: 2px;
+      top: 50%;
+      left: 50%;
+      background: #000000;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .win98-button.close::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
     }
 
     .win98-content {
@@ -178,12 +215,14 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
+      padding-right: 20px;
       padding-bottom: 12vh;
+      scrollbar-width: none;
     }
 
     .terminal::-webkit-scrollbar {
-      width: 16px;
-      height: 16px;
+      width: 0;
+      height: 0;
     }
 
     .terminal::-webkit-scrollbar-track {
@@ -202,7 +241,7 @@
     }
 
     .mobile-win98-scrollbar {
-      display: none;
+      display: flex;
       position: absolute;
       top: 4px;
       right: 4px;
@@ -553,6 +592,11 @@
       z-index: 1;
       opacity: 0.46;
       mix-blend-mode: screen;
+      transition: opacity 120ms steps(1, end);
+    }
+
+    .background-rain.is-typing {
+      opacity: 0.72;
     }
 
     .background-reveal {
@@ -766,8 +810,8 @@
         </span>
         <span class="win98-buttons">
           <span class="win98-button minimize">_</span>
-          <span class="win98-button">□</span>
-          <span class="win98-button">×</span>
+          <span class="win98-button maximize">□</span>
+          <span class="win98-button close">×</span>
         </span>
       </div>
       <div class="win98-content">
@@ -804,6 +848,7 @@
     let backgroundRainColumnCount = 0;
     let backgroundRainFontSize = 16;
     let backgroundRainIntensity = 0.18;
+    let backgroundRainTypingDepth = 0;
     let fixedWidthGroupCounter = 0;
 
     function getBackgroundRainSize() {
@@ -834,6 +879,13 @@
       backgroundRainIntensity = Math.min(1, backgroundRainIntensity + amount);
     }
 
+    function setBackgroundRainTyping(isTyping) {
+      backgroundRainTypingDepth = isTyping
+        ? backgroundRainTypingDepth + 1
+        : Math.max(0, backgroundRainTypingDepth - 1);
+      backgroundRainCanvas.classList.toggle("is-typing", backgroundRainTypingDepth > 0);
+    }
+
     function randomNoiseText(maxLength = 3) {
       const length = 1 + Math.floor(Math.random() * maxLength);
       let text = "";
@@ -847,12 +899,37 @@
 
     function drawBackgroundRain() {
       const { width, height } = getBackgroundRainSize();
-      backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.13 + backgroundRainIntensity * 0.08})`;
+      const typingRain = backgroundRainTypingDepth > 0;
+      const rainLook = typingRain
+        ? {
+            intensity: 0.72,
+            fadeBase: 0.095,
+            fadeScale: 0.045,
+            drawBase: 0.48,
+            drawScale: 0.32,
+            brightBase: 0.32,
+            brightScale: 0.34,
+            dimBase: 0.21,
+            dimScale: 0.28
+          }
+        : {
+            intensity: 0.18,
+            fadeBase: 0.13,
+            fadeScale: 0.08,
+            drawBase: 0.32,
+            drawScale: 0.52,
+            brightBase: 0.27,
+            brightScale: 0.27,
+            dimBase: 0.18,
+            dimScale: 0.24
+          };
+
+      backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${rainLook.fadeBase + rainLook.intensity * rainLook.fadeScale})`;
       backgroundRainContext.fillRect(0, 0, width, height);
       backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
 
       for (let index = 0; index < backgroundRainColumnCount; index += 1) {
-        if (Math.random() > 0.32 + backgroundRainIntensity * 0.52) {
+        if (Math.random() > rainLook.drawBase + rainLook.intensity * rainLook.drawScale) {
           continue;
         }
 
@@ -860,8 +937,8 @@
         const x = index * backgroundRainFontSize;
         const y = backgroundRainColumns[index] * backgroundRainFontSize;
         backgroundRainContext.fillStyle = Math.random() > 0.84
-          ? `rgba(210, 186, 242, ${0.23 + backgroundRainIntensity * 0.27})`
-          : `rgba(132, 92, 176, ${0.14 + backgroundRainIntensity * 0.24})`;
+          ? `rgba(210, 186, 242, ${rainLook.brightBase + rainLook.intensity * rainLook.brightScale})`
+          : `rgba(132, 92, 176, ${rainLook.dimBase + rainLook.intensity * rainLook.dimScale})`;
         backgroundRainContext.fillText(glyph, x, y);
 
         if (y > height + backgroundRainFontSize && Math.random() > 0.965) {
@@ -1139,7 +1216,7 @@
       "__LOGO_RULE__",
       "DETECTED :: desire signal matched",
       "TRACE :: internal impulse found",
-      "CHECK :: Crimson signature confirmed",
+      "CHECK :: crimson signature confirmed",
       "WARNING :: DO NOT RUN unless you are ready to be"
     ];
 
@@ -1164,7 +1241,7 @@
       ] },
       { blank: true },
       { group: [
-        "[CHECK] Crimson signature confirmed.",
+        "[CHECK] crimson signature confirmed.",
         "[CHECK] crimson署名を確認しました。"
       ] },
       { blank: true },
@@ -1472,22 +1549,26 @@
       line.insertBefore(textNode, cursor);
       line.insertBefore(noise, cursor);
 
-      for (const character of text) {
-        const flickers = speedName === "fast" ? 1 : 2 + Math.floor(Math.random() * 2);
-        for (let index = 0; index < flickers; index += 1) {
-          noise.textContent = randomNoiseText(speedName === "fast" ? 1 : 3);
-          boostBackgroundRain(speedName === "fast" ? 0.12 : 0.22);
-          await wait(speedName === "fast" ? 4 : 10 + Math.random() * 18);
+      setBackgroundRainTyping(true);
+      try {
+        for (const character of text) {
+          const flickers = speedName === "fast" ? 1 : 2 + Math.floor(Math.random() * 2);
+          for (let index = 0; index < flickers; index += 1) {
+            noise.textContent = randomNoiseText(speedName === "fast" ? 1 : 3);
+            boostBackgroundRain(speedName === "fast" ? 0.12 : 0.22);
+            await wait(speedName === "fast" ? 4 : 10 + Math.random() * 18);
+          }
+
+          noise.textContent = "";
+          textNode.nodeValue += character;
+          boostBackgroundRain(speedName === "fast" ? 0.18 : 0.28);
+          scrollToBottom();
+          await wait(randomDelay(speedName));
         }
-
-        noise.textContent = "";
-        textNode.nodeValue += character;
-        boostBackgroundRain(speedName === "fast" ? 0.18 : 0.28);
-        scrollToBottom();
-        await wait(randomDelay(speedName));
+      } finally {
+        setBackgroundRainTyping(false);
+        noise.remove();
       }
-
-      noise.remove();
 
       await wait((speeds[speedName] || speeds.normal).lineDelay);
     }
@@ -1508,29 +1589,33 @@
       }
 
       const maxLength = Math.max(...lines.map((line) => line.length));
-      for (let index = 0; index < maxLength; index += 1) {
-        const flickers = speedName === "fast" ? 1 : 2;
-        for (let flickerIndex = 0; flickerIndex < flickers; flickerIndex += 1) {
-          for (const { text, noise } of textNodes) {
-            noise.textContent = index < text.length ? randomNoiseText(speedName === "fast" ? 1 : 2) : "";
+      setBackgroundRainTyping(true);
+      try {
+        for (let index = 0; index < maxLength; index += 1) {
+          const flickers = speedName === "fast" ? 1 : 2;
+          for (let flickerIndex = 0; flickerIndex < flickers; flickerIndex += 1) {
+            for (const { text, noise } of textNodes) {
+              noise.textContent = index < text.length ? randomNoiseText(speedName === "fast" ? 1 : 2) : "";
+            }
+            boostBackgroundRain(speedName === "fast" ? 0.14 : 0.26);
+            await wait(speedName === "fast" ? 4 : 12);
           }
-          boostBackgroundRain(speedName === "fast" ? 0.14 : 0.26);
-          await wait(speedName === "fast" ? 4 : 12);
-        }
 
-        for (const { text, textNode, noise } of textNodes) {
-          noise.textContent = "";
-          if (index < text.length) {
-            textNode.nodeValue += text[index];
+          for (const { text, textNode, noise } of textNodes) {
+            noise.textContent = "";
+            if (index < text.length) {
+              textNode.nodeValue += text[index];
+            }
           }
+          boostBackgroundRain(speedName === "fast" ? 0.24 : 0.36);
+          scrollToBottom();
+          await wait(randomDelay(speedName));
         }
-        boostBackgroundRain(speedName === "fast" ? 0.24 : 0.36);
-        scrollToBottom();
-        await wait(randomDelay(speedName));
-      }
-
-      for (const { noise } of textNodes) {
-        noise.remove();
+      } finally {
+        setBackgroundRainTyping(false);
+        for (const { noise } of textNodes) {
+          noise.remove();
+        }
       }
 
       await wait((speeds[speedName] || speeds.normal).lineDelay);
