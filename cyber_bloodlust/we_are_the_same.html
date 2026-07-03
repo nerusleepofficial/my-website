@@ -205,15 +205,14 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
-      padding: clamp(10px, 2vw, 24px) 0 18vh;
+      padding: clamp(10px, 2vw, 24px) 20px 18vh 0;
       text-shadow: 0 0 12px rgba(216, 212, 220, 0.18);
-      scrollbar-color: #c0c0c0 #808080;
-      scrollbar-width: auto;
+      scrollbar-width: none;
     }
 
     .page::-webkit-scrollbar {
-      width: 16px;
-      height: 16px;
+      width: 0;
+      height: 0;
     }
 
     .page::-webkit-scrollbar-track {
@@ -232,7 +231,7 @@
     }
 
     .mobile-win98-scrollbar {
-      display: none;
+      display: flex;
       position: absolute;
       top: 4px;
       right: 4px;
@@ -255,11 +254,15 @@
     }
 
     .mobile-win98-scrollbar-button {
+      appearance: none;
+      -webkit-appearance: none;
       width: 14px;
       height: 14px;
       flex: 0 0 14px;
       display: grid;
       place-items: center;
+      margin: 0;
+      padding: 0;
       color: #000000;
       background: #c0c0c0;
       border: 1px solid;
@@ -268,22 +271,31 @@
         inset 1px 1px 0 #dfdfdf,
         inset -1px -1px 0 #808080;
       font-family: Arial, sans-serif;
-      font-size: 8px;
+      font-size: 0;
       line-height: 1;
+    }
+
+    .mobile-win98-scrollbar-button::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+
+    .mobile-win98-scrollbar-button:first-child::before {
+      border-bottom: 6px solid #000000;
+    }
+
+    .mobile-win98-scrollbar-button:last-child::before {
+      border-top: 6px solid #000000;
     }
 
     .mobile-win98-scrollbar-track {
       position: relative;
       flex: 1 1 auto;
       min-height: 24px;
-      background:
-        repeating-linear-gradient(
-          45deg,
-          #d7d7d7 0,
-          #d7d7d7 2px,
-          #b7b7b7 2px,
-          #b7b7b7 4px
-        );
+      background: #d4d0c8;
       border-left: 1px solid #808080;
       border-right: 1px solid #ffffff;
       overflow: hidden;
