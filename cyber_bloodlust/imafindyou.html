@@ -151,6 +151,7 @@
       min-height: 0;
       margin: 0 4px 4px;
       padding: clamp(12px, 1.8vw, 22px);
+      position: relative;
       background: transparent;
       border: 2px solid;
       border-color: #404040 #ffffff #ffffff #404040;
@@ -161,6 +162,8 @@
     }
 
     .terminal {
+      position: relative;
+      z-index: 3;
       width: 100%;
       min-width: 0;
       height: 100%;
@@ -382,9 +385,9 @@
 
     .scanlines {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
-      z-index: 5;
+      z-index: 4;
       background: repeating-linear-gradient(
         to bottom,
         rgba(255, 255, 255, 0.025) 0,
@@ -398,9 +401,9 @@
 
     .glitch-overlay {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
-      z-index: 6;
+      z-index: 5;
       opacity: 0;
       overflow: hidden;
       background: transparent;
@@ -443,18 +446,18 @@
 
     .background-rain {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
-      z-index: 3;
+      z-index: 1;
       opacity: 0.46;
       mix-blend-mode: screen;
     }
 
     .background-reveal {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
-      z-index: 1;
+      z-index: 0;
       background-image:
         linear-gradient(rgba(5, 5, 5, 0.3), rgba(5, 5, 5, 0.58)),
         url("./assets/background-reveal.png");
@@ -467,7 +470,7 @@
 
     .background-vignette {
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 2;
       background:
@@ -652,9 +655,6 @@
   </style>
 </head>
 <body>
-  <div class="background-reveal" id="backgroundReveal" aria-hidden="true"></div>
-  <div class="background-vignette" aria-hidden="true"></div>
-  <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
   <main class="screen" aria-label="Command prompt typing animation">
     <section class="win98-window" aria-label="Windows 98 command prompt frame">
       <div class="win98-titlebar" aria-hidden="true">
@@ -669,12 +669,15 @@
         </span>
       </div>
       <div class="win98-content">
+        <div class="background-reveal" id="backgroundReveal" aria-hidden="true"></div>
+        <div class="background-vignette" aria-hidden="true"></div>
+        <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
         <div class="terminal" id="terminal" aria-live="polite"></div>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="glitch-overlay" id="glitchOverlay" aria-hidden="true"></div>
       </div>
     </section>
   </main>
-  <div class="scanlines" aria-hidden="true"></div>
-  <div class="glitch-overlay" id="glitchOverlay" aria-hidden="true"></div>
 
   <script>
     const screen = document.querySelector(".screen");
@@ -701,18 +704,27 @@
     let backgroundRainIntensity = 0.18;
     let fixedWidthGroupCounter = 0;
 
+    function getBackgroundRainSize() {
+      const bounds = backgroundRainCanvas.parentElement.getBoundingClientRect();
+      return {
+        width: Math.max(1, Math.floor(bounds.width)),
+        height: Math.max(1, Math.floor(bounds.height))
+      };
+    }
+
     function resizeBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
       const pixelRatio = window.devicePixelRatio || 1;
-      backgroundRainCanvas.width = Math.floor(window.innerWidth * pixelRatio);
-      backgroundRainCanvas.height = Math.floor(window.innerHeight * pixelRatio);
-      backgroundRainCanvas.style.width = `${window.innerWidth}px`;
-      backgroundRainCanvas.style.height = `${window.innerHeight}px`;
+      backgroundRainCanvas.width = Math.floor(width * pixelRatio);
+      backgroundRainCanvas.height = Math.floor(height * pixelRatio);
+      backgroundRainCanvas.style.width = `${width}px`;
+      backgroundRainCanvas.style.height = `${height}px`;
       backgroundRainContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(window.innerWidth / 70)));
-      backgroundRainColumnCount = Math.ceil(window.innerWidth / backgroundRainFontSize);
+      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(width / 70)));
+      backgroundRainColumnCount = Math.ceil(width / backgroundRainFontSize);
       backgroundRainColumns = Array.from({ length: backgroundRainColumnCount }, () => (
-        Math.floor(Math.random() * window.innerHeight / backgroundRainFontSize)
+        Math.floor(Math.random() * height / backgroundRainFontSize)
       ));
     }
 
@@ -732,8 +744,9 @@
     }
 
     function drawBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
       backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.13 + backgroundRainIntensity * 0.08})`;
-      backgroundRainContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      backgroundRainContext.fillRect(0, 0, width, height);
       backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
 
       for (let index = 0; index < backgroundRainColumnCount; index += 1) {
@@ -749,7 +762,7 @@
           : `rgba(132, 92, 176, ${0.14 + backgroundRainIntensity * 0.24})`;
         backgroundRainContext.fillText(glyph, x, y);
 
-        if (y > window.innerHeight + backgroundRainFontSize && Math.random() > 0.965) {
+        if (y > height + backgroundRainFontSize && Math.random() > 0.965) {
           backgroundRainColumns[index] = 0;
         } else {
           backgroundRainColumns[index] += 1;
@@ -766,12 +779,20 @@
       refitFixedWidthLines();
     });
     window.addEventListener("orientationchange", () => {
+      resizeBackgroundRain();
       window.setTimeout(refitFixedWidthLines, 220);
     });
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", () => {
+        resizeBackgroundRain();
         window.setTimeout(refitFixedWidthLines, 80);
       });
+    }
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => {
+        resizeBackgroundRain();
+        refitFixedWidthLines();
+      }).observe(backgroundRainCanvas.parentElement);
     }
     drawBackgroundRain();
 
@@ -1100,9 +1121,9 @@
       for (let index = 0; index < sliceCount; index += 1) {
         const slice = document.createElement("span");
         slice.className = "glitch-fragment is-slice";
-        slice.style.setProperty("--fragment-x", `${randomRange(-4, 38)}vw`);
-        slice.style.setProperty("--fragment-y", `${randomRange(4, 94)}vh`);
-        slice.style.setProperty("--fragment-width", `${randomRange(20, 76)}vw`);
+        slice.style.setProperty("--fragment-x", `${randomRange(-4, 38)}%`);
+        slice.style.setProperty("--fragment-y", `${randomRange(4, 94)}%`);
+        slice.style.setProperty("--fragment-width", `${randomRange(20, 76)}%`);
         slice.style.setProperty("--fragment-height", `${randomRange(10, 28)}px`);
         slice.style.setProperty("--fragment-color", colors[Math.floor(Math.random() * colors.length)]);
         slice.style.setProperty("--fragment-opacity", randomRange(0.58, 0.98).toFixed(2));
@@ -1113,8 +1134,8 @@
         const block = document.createElement("span");
         const isWide = Math.random() > 0.58;
         block.className = "glitch-fragment";
-        block.style.setProperty("--fragment-x", `${randomRange(0, 98)}vw`);
-        block.style.setProperty("--fragment-y", `${randomRange(0, 98)}vh`);
+        block.style.setProperty("--fragment-x", `${randomRange(0, 98)}%`);
+        block.style.setProperty("--fragment-y", `${randomRange(0, 98)}%`);
         block.style.setProperty("--fragment-width", isWide ? `${randomRange(18, 150)}px` : `${randomRange(3, 16)}px`);
         block.style.setProperty("--fragment-height", isWide ? `${randomRange(8, 20)}px` : `${randomRange(3, 18)}px`);
         block.style.setProperty("--fragment-color", colors[Math.floor(Math.random() * colors.length)]);
@@ -1200,7 +1221,7 @@
       lines.forEach((line) => {
         line.style.fontSize = "";
       });
-      const availableWidth = terminal.clientWidth - 2;
+      const availableWidth = Math.max(1, terminal.clientWidth - 2);
       const widestLine = lines.reduce((widest, line) => (
         line.scrollWidth > widest.scrollWidth ? line : widest
       ), lines[0]);
@@ -1211,7 +1232,7 @@
       if (!currentSize) {
         return;
       }
-      const scale = Math.max(0.62, availableWidth / widestLine.scrollWidth);
+      const scale = Math.min(1, availableWidth / widestLine.scrollWidth);
       const fittedSize = `${currentSize * scale}px`;
       lines.forEach((line) => {
         line.style.fontSize = fittedSize;
