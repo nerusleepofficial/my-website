@@ -208,6 +208,28 @@
       -webkit-overflow-scrolling: touch;
       padding: clamp(10px, 2vw, 24px) 0 18vh;
       text-shadow: 0 0 12px rgba(216, 212, 220, 0.18);
+      scrollbar-color: #c0c0c0 #808080;
+      scrollbar-width: auto;
+    }
+
+    .page::-webkit-scrollbar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .page::-webkit-scrollbar-track {
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #808080 #ffffff #ffffff #808080;
+    }
+
+    .page::-webkit-scrollbar-thumb {
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
     }
 
     .header-art {
