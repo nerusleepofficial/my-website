@@ -15,6 +15,12 @@
       --red: #aa1630;
     }
 
+    @font-face {
+      font-family: "Win98PixelTitle";
+      src: url("./assets/fonts/win98-pixel.ttf") format("truetype");
+      font-display: swap;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -120,11 +126,14 @@
       gap: 8px;
       background: linear-gradient(90deg, #000080 0%, #0a3d9f 58%, #1084d0 100%);
       color: #ffffff;
-      font-family: "MS Sans Serif", Tahoma, "Microsoft Sans Serif", "MS PGothic", Arial, sans-serif;
+      font-family: "Win98PixelTitle", "MS Sans Serif", Tahoma, Arial, sans-serif;
       font-size: 13px;
       font-weight: 400;
       line-height: 1;
       text-shadow: none;
+      -webkit-font-smoothing: none;
+      font-smooth: never;
+      text-rendering: optimizeSpeed;
       user-select: none;
     }
 
@@ -135,7 +144,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       line-height: 1;
-      transform: none;
+      transform: translateY(1px);
     }
 
     .win98-title-label {
@@ -540,7 +549,7 @@
       <div class="win98-titlebar" aria-hidden="true">
         <span class="win98-title-label">
           <img class="win98-title-icon" src="../favicon.png" alt="">
-          <span class="win98-title-text">ＦＯＲＳＡＫＥＮ　ＣＨＩＬＤ</span>
+          <span class="win98-title-text">FORSAKEN CHILD</span>
         </span>
         <span class="win98-buttons">
           <span class="win98-button minimize">_</span>
