@@ -473,6 +473,19 @@
       word-break: break-word;
     }
 
+    .prompt-fail {
+      margin: 0.1em 0 0.15em;
+      color: rgba(126, 18, 27, 0.92);
+      font-size: 0.78em;
+      line-height: 1.25;
+      text-shadow: 0 0 0.55em rgba(126, 18, 27, 0.24);
+      white-space: pre-wrap;
+    }
+
+    .prompt-fail:empty {
+      display: none;
+    }
+
     .prompt-input {
       width: min(18ch, 48vw);
       border: 0;
@@ -1143,7 +1156,14 @@
       { blank: true },
       { instant: asciiViewTable, className: "ascii table-ascii" },
       { instant: [""], className: "half-gap" },
-      { prompt: "HANG", maxLength: 4, validate: (value) => value.trim() === "HANG" }
+      {
+        prompt: "HANG",
+        maxLength: 8,
+        sideAnswers: [
+          { answer: "lonesome", url: "when_you_left.html" }
+        ],
+        validate: (value) => isCommand(value, "hang")
+      }
     ];
 
     const hangSequence = [
@@ -1176,7 +1196,15 @@
         "ENCRYPTED INSTRUCTION: JVFU",
         "KEY: HANG"
       ] },
-      { prompt: "BURN", maxLength: 7, hints: hangHints, validate: (value) => value.trim().toLowerCase() === "burn" }
+      {
+        prompt: "BURN",
+        maxLength: 7,
+        hints: hangHints,
+        sideAnswers: [
+          { answer: "unity", url: "we_are_the_same.html" }
+        ],
+        validate: (value) => isCommand(value, "burn")
+      }
     ];
 
     const burnSequence = [
@@ -1219,7 +1247,15 @@
         "KEY_01: H A N G",
         "KEY_02: B U R N"
       ] },
-      { prompt: "KILL", maxLength: 7, hints: killHints, validate: (value) => value.replace(/\s+/g, "").toLowerCase() === "kill" }
+      {
+        prompt: "KILL",
+        maxLength: 7,
+        hints: killHints,
+        sideAnswers: [
+          { answer: "outcast", url: "forsaken_child.html" }
+        ],
+        validate: (value) => isCommand(value, "kill")
+      }
     ];
 
     const logoLines = [
@@ -1683,6 +1719,29 @@
       scrollToBottom();
     }
 
+    function normalizeAnswer(value) {
+      return value.trim().replace(/\s+/g, "").toLowerCase();
+    }
+
+    function isCommand(value, command) {
+      return normalizeAnswer(value) === command;
+    }
+
+    function findSideAnswer(item, answer) {
+      if (!item.sideAnswers) {
+        return null;
+      }
+
+      const normalizedAnswer = normalizeAnswer(answer);
+      return item.sideAnswers.find((sideAnswer) => (
+        normalizeAnswer(sideAnswer.answer) === normalizedAnswer
+      )) || null;
+    }
+
+    function openSideAnswer(url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
     function addPromptForm(item) {
       cursor.remove();
 
@@ -1702,6 +1761,10 @@
       form.className = "prompt-form";
       form.setAttribute("aria-label", item.prompt);
 
+      const failMessage = document.createElement("div");
+      failMessage.className = "prompt-fail";
+      failMessage.setAttribute("aria-live", "polite");
+
       const input = document.createElement("input");
       input.className = "prompt-input";
       input.type = "text";
@@ -1709,7 +1772,11 @@
       input.autocomplete = "off";
       input.autocapitalize = "none";
       input.spellcheck = false;
-      input.maxLength = item.maxLength || 1;
+      input.maxLength = Math.max(
+        item.maxLength || 1,
+        ...Object.keys(item.hints || {}).map((label) => label.length),
+        ...(item.sideAnswers || []).map((sideAnswer) => sideAnswer.answer.length)
+      );
       input.setAttribute("aria-label", item.prompt);
 
       if (item.hints) {
@@ -1732,6 +1799,7 @@
       button.textContent = "Send";
 
       form.append(input, button);
+      terminal.appendChild(failMessage);
       terminal.appendChild(form);
       input.focus();
       scrollToBottom();
@@ -1741,8 +1809,10 @@
 
         const answer = input.value.trim();
         const hint = item.hints?.[answer];
+        const sideAnswer = findSideAnswer(item, answer);
 
         if (hint) {
+          failMessage.textContent = "";
           hintAnswer.textContent = hint.join("\n");
           input.value = "";
           input.focus();
@@ -1750,12 +1820,23 @@
           return;
         }
 
-        if (!item.validate(answer)) {
+        if (sideAnswer) {
+          failMessage.textContent = "";
+          openSideAnswer(sideAnswer.url);
           input.value = "";
           input.focus();
           return;
         }
 
+        if (!item.validate(answer)) {
+          failMessage.textContent = "[FAIL] decrypt process aborted.";
+          input.value = "";
+          input.focus();
+          scrollToBottom();
+          return;
+        }
+
+        failMessage.textContent = "";
         input.disabled = true;
         button.disabled = true;
         stageIndex += 1;
