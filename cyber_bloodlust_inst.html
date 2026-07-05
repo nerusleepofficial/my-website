@@ -35,37 +35,20 @@
 
   body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
-    background:
-      radial-gradient(circle at 18% 12%, rgba(159, 16, 42, 0.08), transparent 30%),
-      linear-gradient(180deg, #fbfbf8 0%, var(--bg) 45%, #f4f4f0 100%);
+    background: var(--bg);
     color: var(--text-main);
     line-height: 1.8;
     font-size: 15px;
-    min-height: 100vh;
   }
 
   header {
-    position: relative;
-    overflow: hidden;
     background: var(--white);
     border-bottom: 1px solid var(--border);
-    padding: 2.5rem 1.5rem 2rem;
+    padding: 2.5rem 0 2rem;
     text-align: center;
   }
 
-  header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(90deg, transparent 0 16px, rgba(61, 215, 240, 0.08) 16px 17px, transparent 17px 34px),
-      linear-gradient(180deg, transparent 0 20px, rgba(159, 16, 42, 0.08) 20px 21px, transparent 21px 42px);
-    mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
-  }
-
   header .site-name {
-    position: relative;
     font-size: 12px;
     letter-spacing: 0.15em;
     color: var(--text-muted);
@@ -74,10 +57,9 @@
   }
 
   header h1 {
-    position: relative;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.05em;
   }
 
   main {
