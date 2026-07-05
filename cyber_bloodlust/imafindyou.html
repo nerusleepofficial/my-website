@@ -410,6 +410,21 @@
       text-shadow: 0 0 13px rgba(255, 217, 90, 0.34);
     }
 
+    .orange {
+      color: #ff9b45;
+      text-shadow: 0 0 13px rgba(255, 155, 69, 0.34);
+    }
+
+    .purple {
+      color: #b98cff;
+      text-shadow: 0 0 13px rgba(185, 140, 255, 0.36);
+    }
+
+    .pink {
+      color: #ff8ac8;
+      text-shadow: 0 0 13px rgba(255, 138, 200, 0.36);
+    }
+
     .crimson {
       color: var(--crimson);
       font-weight: 700;
@@ -422,6 +437,11 @@
       color: #79b8ff;
       text-decoration: underline;
       text-underline-offset: 0.18em;
+      text-shadow: 0 0 12px rgba(121, 184, 255, 0.32);
+    }
+
+    .terminal-link.access-link {
+      color: #79b8ff;
       text-shadow: 0 0 12px rgba(121, 184, 255, 0.32);
     }
 
@@ -1261,7 +1281,14 @@
         maxLength: 7,
         hints: killHints,
         sideAnswers: [
-          { answer: "outcast", url: "forsaken_child.html" }
+          { answer: "outcast", url: "forsaken_child.html" },
+          {
+            answer: "master",
+            url: "master.html",
+            className: "purple",
+            commandLine: String.raw`C:\Users\??_??> unlock .\Assets\Images.enc`,
+            linkPrompt: String.raw`C:\Users\??_??\Assets> `
+          }
         ],
         validate: (value) => isCommand(value, "kill")
       }
@@ -1728,12 +1755,23 @@
       scrollToBottom();
     }
 
+    const specialAnswers = ["neru"];
+
     function normalizeAnswer(value) {
       return value.trim().replace(/\s+/g, "").toLowerCase();
     }
 
     function isCommand(value, command) {
       return normalizeAnswer(value) === command;
+    }
+
+    function isLoveAnswer(value) {
+      return normalizeAnswer(value) === "neru";
+    }
+
+    function addLoveAnswer() {
+      addLine("");
+      addLine("Thank you for playing<3", "pink");
     }
 
     function findSideAnswer(item, answer) {
@@ -1747,8 +1785,35 @@
       )) || null;
     }
 
-    function openSideAnswer(url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+    async function addSideAnswerAccess(sideAnswer) {
+      const accessClassName = sideAnswer.className || "orange";
+      addLine("");
+      await typeGroup([
+        "[OK] access authorized.",
+        "[OK] アクセスが許可されました。"
+      ], accessClassName, "fast");
+      cursor.remove();
+
+      if (sideAnswer.commandLine) {
+        addLine("");
+        await typeLine(sideAnswer.commandLine, accessClassName, "normal");
+        cursor.remove();
+      } else {
+        addLine("");
+      }
+
+      const line = addLine("");
+      const command = document.createElement("span");
+      command.className = "dim";
+      command.textContent = sideAnswer.linkPrompt || String.raw`C:\Users\lona\Memories> `;
+      const link = document.createElement("a");
+      link.className = "terminal-link access-link";
+      link.href = sideAnswer.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = sideAnswer.label || sideAnswer.url;
+      line.append(command, link);
+      scrollToBottom();
     }
 
     function addPromptForm(item) {
@@ -1769,6 +1834,8 @@
       const form = document.createElement("form");
       form.className = "prompt-form";
       form.setAttribute("aria-label", item.prompt);
+      const renderedSideAnswers = new Set();
+      let loveAnswerRendered = false;
 
       const failMessage = document.createElement("div");
       failMessage.className = "prompt-fail";
@@ -1783,6 +1850,7 @@
       input.spellcheck = false;
       input.maxLength = Math.max(
         item.maxLength || 1,
+        ...specialAnswers.map((answer) => answer.length),
         ...Object.keys(item.hints || {}).map((label) => label.length),
         ...(item.sideAnswers || []).map((sideAnswer) => sideAnswer.answer.length)
       );
@@ -1820,6 +1888,18 @@
         const hint = item.hints?.[answer];
         const sideAnswer = findSideAnswer(item, answer);
 
+        if (isLoveAnswer(answer)) {
+          failMessage.textContent = "";
+          if (!loveAnswerRendered) {
+            loveAnswerRendered = true;
+            addLoveAnswer();
+          }
+          input.value = "";
+          input.focus();
+          scrollToBottom();
+          return;
+        }
+
         if (hint) {
           failMessage.textContent = "";
           hintAnswer.textContent = hint.join("\n");
@@ -1831,9 +1911,14 @@
 
         if (sideAnswer) {
           failMessage.textContent = "";
-          openSideAnswer(sideAnswer.url);
+          const sideAnswerKey = `${normalizeAnswer(sideAnswer.answer)}:${sideAnswer.url}`;
+          if (!renderedSideAnswers.has(sideAnswerKey)) {
+            renderedSideAnswers.add(sideAnswerKey);
+            await addSideAnswerAccess(sideAnswer);
+          }
           input.value = "";
           input.focus();
+          scrollToBottom();
           return;
         }
 
