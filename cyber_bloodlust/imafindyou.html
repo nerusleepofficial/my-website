@@ -515,6 +515,11 @@
       display: none;
     }
 
+    .abort-fail {
+      color: rgba(126, 18, 27, 0.92);
+      text-shadow: 0 0 0.55em rgba(126, 18, 27, 0.24);
+    }
+
     .prompt-input {
       width: min(18ch, 48vw);
       border: 0;
@@ -1055,7 +1060,11 @@
       { blank: true },
       { pause: 1000 },
       { type: "Repair? (y/n)" },
-      { prompt: "repair", validate: (value) => value.trim().toLowerCase() === "y" }
+      {
+        prompt: "repair",
+        abortOn: (value) => value.trim().toLowerCase() === "n",
+        validate: (value) => value.trim().toLowerCase() === "y"
+      }
     ];
 
     const brokenViewTable = [
@@ -1342,7 +1351,11 @@
       { blank: true },
       { pause: 1000 },
       { type: "Open file? (y/n)", className: "yellow", speed: "slow" },
-      { prompt: "open file", validate: (value) => value.trim().toLowerCase() === "y" }
+      {
+        prompt: "open file",
+        abortOn: (value) => value.trim().toLowerCase() === "n",
+        validate: (value) => value.trim().toLowerCase() === "y"
+      }
     ];
 
     const openSequence = [
@@ -1922,8 +1935,19 @@
           return;
         }
 
+        if (item.abortOn?.(answer)) {
+          failMessage.textContent = "";
+          input.disabled = true;
+          button.disabled = true;
+          addLine("");
+          await typeGroup(["[FAIL] decrypt process aborted."], "abort-fail", "fast");
+          cursor.remove();
+          scrollToBottom();
+          return;
+        }
+
         if (!item.validate(answer)) {
-          failMessage.textContent = "[FAIL] decrypt process aborted.";
+          failMessage.textContent = "[ERROR] invalid decryption.";
           input.value = "";
           input.focus();
           scrollToBottom();
