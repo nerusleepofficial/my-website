@@ -405,6 +405,16 @@
       text-shadow: 0 0 13px rgba(98, 255, 145, 0.38);
     }
 
+    .dark-green {
+      color: rgba(62, 142, 85, 0.95);
+      text-shadow: 0 0 12px rgba(62, 142, 85, 0.28);
+    }
+
+    .dark-red {
+      color: rgba(126, 18, 27, 0.92);
+      text-shadow: 0 0 0.55em rgba(126, 18, 27, 0.24);
+    }
+
     .yellow {
       color: var(--yellow);
       text-shadow: 0 0 13px rgba(255, 217, 90, 0.34);
@@ -546,8 +556,8 @@
       background: transparent;
       color: var(--text);
       font: inherit;
-      line-height: 1;
-      padding: 0.22em 0.55em;
+      line-height: 1.05;
+      padding: 0.3em 0.55em 0.16em;
       cursor: pointer;
       text-shadow: inherit;
     }
@@ -556,6 +566,73 @@
     .send-button:focus-visible {
       background: rgba(215, 215, 215, 0.13);
       outline: 0;
+    }
+
+    .share-form {
+      margin-top: 0.2em;
+    }
+
+    .share-output {
+      margin: 0.2em 0 0.45em;
+    }
+
+    .share-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.55em;
+      flex-wrap: wrap;
+    }
+
+    .share-media {
+      display: block;
+      width: min(292px, 84vw);
+      max-width: 100%;
+      height: auto;
+      image-rendering: auto;
+      border: 1px solid rgba(215, 215, 215, 0.36);
+      box-shadow: 0 0 18px rgba(194, 164, 235, 0.14);
+    }
+
+    .x-share-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45em;
+      min-height: 2.1em;
+      padding: 0.32em 0.82em;
+      border-radius: 999px;
+      border: 1px solid #2f3336;
+      background: #000000;
+      color: #ffffff;
+      font: 700 0.72em Arial, Helvetica, sans-serif;
+      line-height: 1;
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
+    }
+
+    .x-share-button:hover,
+    .x-share-button:focus-visible {
+      background: #1d1f23;
+      outline: 0;
+    }
+
+    .native-share-button {
+      border-color: rgba(215, 215, 215, 0.68);
+      background: transparent;
+      color: var(--text);
+    }
+
+    .native-share-button:hover,
+    .native-share-button:focus-visible {
+      background: rgba(215, 215, 215, 0.13);
+    }
+
+    .share-status {
+      color: rgba(126, 18, 27, 0.92);
+      font-size: 0.78em;
+      line-height: 1.25;
+      text-shadow: 0 0 0.55em rgba(126, 18, 27, 0.24);
     }
 
     .send-button:disabled,
@@ -834,7 +911,11 @@
 
       .send-button {
         font-size: 16px;
-        padding: 0.26em 0.48em;
+        padding: 0.32em 0.48em 0.18em;
+      }
+
+      .share-media {
+        width: min(292px, calc(100vw - 76px));
       }
 
       .hint-button {
@@ -870,7 +951,7 @@
       <div class="win98-titlebar" aria-hidden="true">
         <span class="win98-title-label">
           <img class="win98-title-icon" src="../favicon.png" alt="">
-          <span class="win98-title-text">cmd.exe</span>
+          <span class="win98-title-text">C:\Brain\System32\cmd.exe</span>
         </span>
         <span class="win98-buttons">
           <span class="win98-button minimize">_</span>
@@ -1295,7 +1376,7 @@
             answer: "master",
             url: "master.html",
             className: "purple",
-            commandLine: String.raw`C:\Users\??_??> unlock .\Assets\Images.enc`,
+            commandLine: String.raw`C:\Users\??_??> unlock .\Assets\images.enc`,
             linkPrompt: String.raw`C:\Users\??_??\Assets> `
           }
         ],
@@ -1353,7 +1434,26 @@
       { type: "Open file? (y/n)", className: "yellow", speed: "slow" },
       {
         prompt: "open file",
-        abortOn: (value) => value.trim().toLowerCase() === "n",
+        forceContinueOn: (value) => value.trim().toLowerCase() === "n",
+        forceSequence: [
+          {
+            group: [
+              "[EXECUTE] user permission overwritten.",
+              "[EXECUTE] ユーザ権限が上書きされました。"
+            ],
+            className: "dark-green",
+            speed: "normal"
+          },
+          { blank: true },
+          {
+            group: [
+              "[NOTICE] file launch forced.",
+              "[NOTICE] ファイルを強制起動します。"
+            ],
+            className: "dark-red",
+            speed: "fast"
+          }
+        ],
         validate: (value) => value.trim().toLowerCase() === "y"
       }
     ];
@@ -1366,7 +1466,8 @@
       { pause: 1000 },
       { jumpGlitch: true },
       { type: "ＷＥＬＣＯＭＥ　ＴＯ　ＴＨＥ　ＯＴＨＥＲ　ＷＯＲＬＤ", className: "crimson", speed: "slow" },
-      { link: "https://www.neru-official.com/" }
+      { link: "https://www.neru-official.com/" },
+      { sharePrompt: true }
     ];
 
     const stages = [introSequence, repairSequence, hangSequence, burnSequence, killSequence, openSequence];
@@ -1768,6 +1869,127 @@
       scrollToBottom();
     }
 
+    function getShareLabels() {
+      const languages = Array.isArray(navigator.languages) && navigator.languages.length > 0
+        ? navigator.languages
+        : [navigator.language || ""];
+      const isJapanese = languages.some((language) => language.toLowerCase().startsWith("ja"));
+
+      return isJapanese
+        ? {
+          share: "共有",
+          native: "GIFを共有",
+          x: "Xで共有",
+          shareUnavailable: "[ERROR] このブラウザではGIF共有に対応していません。",
+          shareFailed: "[ERROR] GIF共有に失敗しました。"
+        }
+        : {
+          share: "SHARE",
+          native: "Share GIF",
+          x: "Post on X",
+          shareUnavailable: "[ERROR] GIF sharing is unavailable on this browser.",
+          shareFailed: "[ERROR] GIF sharing failed."
+        };
+    }
+
+    function addSharePrompt() {
+      cursor.remove();
+      addLine("");
+      const shareLabels = getShareLabels();
+
+      const form = document.createElement("form");
+      form.className = "prompt-form share-form";
+      form.setAttribute("aria-label", "share");
+
+      const button = document.createElement("button");
+      button.className = "send-button share-button";
+      button.type = "submit";
+      button.textContent = shareLabels.share;
+
+      form.appendChild(button);
+      terminal.appendChild(form);
+      scrollToBottom();
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        button.disabled = true;
+        showShareOutput();
+      }, { once: true });
+    }
+
+    function showShareOutput() {
+      addLine("");
+      const shareLabels = getShareLabels();
+      const shareGifPath = "./assets/imafindyou/goal_share.gif";
+
+      const imageLine = document.createElement("div");
+      imageLine.className = "line share-output";
+      const image = document.createElement("img");
+      image.className = "share-media";
+      image.src = shareGifPath;
+      image.alt = "[GOAL] deepest cyber layer reached.";
+      imageLine.appendChild(image);
+      terminal.appendChild(imageLine);
+
+      addLine("");
+      addLine("[OK] save/post enabled.");
+      addLine("[OK] 保存・投稿可能。");
+      addLine("");
+      const buttonLine = document.createElement("div");
+      buttonLine.className = "line share-output share-actions";
+      const nativeButton = document.createElement("button");
+      nativeButton.className = "send-button native-share-button";
+      nativeButton.type = "button";
+      nativeButton.textContent = shareLabels.native;
+      const shareStatus = document.createElement("span");
+      shareStatus.className = "share-status";
+
+      nativeButton.addEventListener("click", async () => {
+        shareStatus.textContent = "";
+
+        if (!navigator.share || !navigator.canShare) {
+          shareStatus.textContent = shareLabels.shareUnavailable;
+          scrollToBottom();
+          return;
+        }
+
+        try {
+          const response = await fetch(shareGifPath);
+          const blob = await response.blob();
+          const file = new File([blob], "cyber_bloodlust_goal.gif", { type: "image/gif" });
+          const shareData = {
+            files: [file],
+            title: "[GOAL] deepest cyber layer reached.",
+            text: "[GOAL] deepest cyber layer reached. #cyber_bloodlust"
+          };
+
+          if (!navigator.canShare(shareData)) {
+            shareStatus.textContent = shareLabels.shareUnavailable;
+            scrollToBottom();
+            return;
+          }
+
+          await navigator.share(shareData);
+        } catch (error) {
+          if (error?.name !== "AbortError") {
+            shareStatus.textContent = shareLabels.shareFailed;
+            scrollToBottom();
+          }
+        }
+      });
+
+      const xButton = document.createElement("a");
+      xButton.className = "x-share-button";
+      xButton.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent("[GOAL] deepest cyber layer reached. #cyber_bloodlust")}`;
+      xButton.target = "_blank";
+      xButton.rel = "noopener noreferrer";
+      xButton.setAttribute("aria-label", "Share on X");
+      xButton.textContent = shareLabels.x;
+      buttonLine.append(nativeButton, xButton, shareStatus);
+      terminal.appendChild(buttonLine);
+      scrollToBottom();
+    }
+
     const specialAnswers = ["neru"];
 
     function normalizeAnswer(value) {
@@ -1946,6 +2168,28 @@
           return;
         }
 
+        if (item.forceContinueOn?.(answer)) {
+          failMessage.textContent = "";
+          input.disabled = true;
+          button.disabled = true;
+          addLine("");
+          for (const step of item.forceSequence || []) {
+            if (step.blank) {
+              addLine("");
+            } else if (step.group) {
+              await typeGroup(step.group, step.className || "", step.speed || "normal");
+            } else if (step.type) {
+              await typeLine(step.type, step.className || "", step.speed || "normal");
+            }
+          }
+          cursor.remove();
+          stageIndex += 1;
+          updateBackgroundReveal();
+          triggerProgressGlitch(stageIndex);
+          await runSequence(stages[stageIndex]);
+          return;
+        }
+
         if (!item.validate(answer)) {
           failMessage.textContent = "[ERROR] invalid decryption.";
           input.value = "";
@@ -1984,6 +2228,8 @@
           await triggerJumpScareGlitch();
         } else if (item.link) {
           addLink(item.link);
+        } else if (item.sharePrompt) {
+          addSharePrompt();
         } else {
           await typeLine(item.type, item.className || "", item.speed || "normal");
         }
