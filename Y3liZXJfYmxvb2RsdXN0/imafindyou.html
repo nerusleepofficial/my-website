@@ -1881,18 +1881,18 @@
 
       return isJapanese
         ? {
-          share: "共有",
-          native: "Share",
+          share: "SHARE",
+          native: "アプリで共有",
           x: "Xで共有",
-          shareUnavailable: "[ERROR] このブラウザでは動画共有に対応していません。",
-          shareFailed: "[ERROR] 動画共有に失敗しました。"
+          shareUnavailable: "[ERROR] このブラウザでは画像共有に対応していません。",
+          shareFailed: "[ERROR] 画像共有に失敗しました。"
         }
         : {
           share: "SHARE",
-          native: "Share",
+          native: "Share on Apps",
           x: "Post on X",
-          shareUnavailable: "[ERROR] video sharing is unavailable on this browser.",
-          shareFailed: "[ERROR] video sharing failed."
+          shareUnavailable: "[ERROR] image sharing is unavailable on this browser.",
+          shareFailed: "[ERROR] image sharing failed."
         };
     }
 
@@ -1925,7 +1925,7 @@
       addLine("");
       const shareLabels = getShareLabels();
       const shareGifPath = "./assets/imafindyou/goal_share.gif";
-      const shareVideoPath = "./assets/imafindyou/goal_share.mp4";
+      const shareImagePath = "./assets/imafindyou/goal_share.png";
 
       const imageLine = document.createElement("div");
       imageLine.className = "line share-output";
@@ -1959,9 +1959,9 @@
         }
 
         try {
-          const response = await fetch(shareVideoPath);
+          const response = await fetch(shareImagePath);
           const blob = await response.blob();
-          const file = new File([blob], "cyber_bloodlust_goal.mp4", { type: "video/mp4" });
+          const file = new File([blob], "cyber_bloodlust_goal.png", { type: "image/png" });
           const shareData = {
             files: [file],
             title: "[GOAL] deepest cyber layer reached.",
