@@ -583,6 +583,23 @@
       flex-wrap: wrap;
     }
 
+    .share-actions .send-button,
+    .share-actions .x-share-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45em;
+      min-width: 11.8em;
+      min-height: 2.1em;
+      padding: 0.32em 0.82em;
+      border-radius: 999px;
+      font: 700 0.72em Arial, Helvetica, sans-serif;
+      line-height: 1;
+      text-align: center;
+      text-shadow: none;
+      white-space: nowrap;
+    }
+
     .share-media {
       display: block;
       width: min(292px, 84vw);
@@ -594,20 +611,10 @@
     }
 
     .x-share-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45em;
-      min-height: 2.1em;
-      padding: 0.32em 0.82em;
-      border-radius: 999px;
       border: 1px solid #2f3336;
       background: #000000;
       color: #ffffff;
-      font: 700 0.72em Arial, Helvetica, sans-serif;
-      line-height: 1;
       text-decoration: none;
-      text-shadow: none;
       box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
     }
 
@@ -1890,7 +1897,7 @@
         : {
           share: "SHARE",
           native: "Share on Apps",
-          x: "Post on X",
+          x: "Share on X",
           shareUnavailable: "[ERROR] image sharing is unavailable on this browser.",
           shareFailed: "[ERROR] image sharing failed."
         };
