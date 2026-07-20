@@ -618,14 +618,17 @@
     }
 
     .native-share-button {
-      border-color: rgba(215, 215, 215, 0.68);
-      background: transparent;
-      color: var(--text);
+      border-color: rgba(150, 175, 255, 0.72);
+      background: rgba(92, 110, 185, 0.28);
+      color: rgba(226, 230, 255, 0.98);
+      box-shadow:
+        inset 0 0 0 1px rgba(235, 238, 255, 0.08),
+        0 0 14px rgba(120, 145, 235, 0.16);
     }
 
     .native-share-button:hover,
     .native-share-button:focus-visible {
-      background: rgba(215, 215, 215, 0.13);
+      background: rgba(112, 135, 215, 0.38);
     }
 
     .share-status {
@@ -1143,6 +1146,7 @@
       { type: "Repair? (y/n)" },
       {
         prompt: "repair",
+        debugAll: true,
         abortOn: (value) => value.trim().toLowerCase() === "n",
         validate: (value) => value.trim().toLowerCase() === "y"
       }
@@ -1878,17 +1882,17 @@
       return isJapanese
         ? {
           share: "共有",
-          native: "GIFを共有",
+          native: "Share",
           x: "Xで共有",
-          shareUnavailable: "[ERROR] このブラウザではGIF共有に対応していません。",
-          shareFailed: "[ERROR] GIF共有に失敗しました。"
+          shareUnavailable: "[ERROR] このブラウザでは動画共有に対応していません。",
+          shareFailed: "[ERROR] 動画共有に失敗しました。"
         }
         : {
           share: "SHARE",
-          native: "Share GIF",
+          native: "Share",
           x: "Post on X",
-          shareUnavailable: "[ERROR] GIF sharing is unavailable on this browser.",
-          shareFailed: "[ERROR] GIF sharing failed."
+          shareUnavailable: "[ERROR] video sharing is unavailable on this browser.",
+          shareFailed: "[ERROR] video sharing failed."
         };
     }
 
@@ -1921,6 +1925,7 @@
       addLine("");
       const shareLabels = getShareLabels();
       const shareGifPath = "./assets/imafindyou/goal_share.gif";
+      const shareVideoPath = "./assets/imafindyou/goal_share.mp4";
 
       const imageLine = document.createElement("div");
       imageLine.className = "line share-output";
@@ -1954,9 +1959,9 @@
         }
 
         try {
-          const response = await fetch(shareGifPath);
+          const response = await fetch(shareVideoPath);
           const blob = await response.blob();
-          const file = new File([blob], "cyber_bloodlust_goal.gif", { type: "image/gif" });
+          const file = new File([blob], "cyber_bloodlust_goal.mp4", { type: "video/mp4" });
           const shareData = {
             files: [file],
             title: "[GOAL] deepest cyber layer reached.",
@@ -1990,7 +1995,7 @@
       scrollToBottom();
     }
 
-    const specialAnswers = ["neru"];
+    const specialAnswers = ["neru", "dbg_all"];
 
     function normalizeAnswer(value) {
       return value.trim().replace(/\s+/g, "").toLowerCase();
@@ -2002,6 +2007,10 @@
 
     function isLoveAnswer(value) {
       return normalizeAnswer(value) === "neru";
+    }
+
+    function isDebugAllAnswer(value) {
+      return normalizeAnswer(value) === "dbg_all";
     }
 
     function addLoveAnswer() {
@@ -2048,6 +2057,74 @@
       link.rel = "noopener noreferrer";
       link.textContent = sideAnswer.label || sideAnswer.url;
       line.append(command, link);
+      scrollToBottom();
+    }
+
+    function showLinesImmediate(lines, className = "", perLineClass = {}) {
+      cursor.remove();
+      const shouldFitAsGroup = className.includes("table-ascii") || className.includes("logo-ascii");
+      const fitGroupId = shouldFitAsGroup ? `fit-group-${fixedWidthGroupCounter += 1}` : "";
+      const fittedLines = [];
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const lineClass = Object.prototype.hasOwnProperty.call(perLineClass, index)
+          ? perLineClass[index]
+          : className;
+        const line = addLine(lines[index], lineClass);
+
+        if (shouldFitAsGroup && lineClass === className) {
+          line.dataset.fitGroup = fitGroupId;
+          if (className.includes("logo-ascii")) {
+            if (/^=+$/.test(lines[index])) {
+              line.dataset.logoRole = "border";
+            } else if (/^-+$/.test(lines[index])) {
+              line.dataset.logoRole = "rule";
+            }
+          }
+          fittedLines.push(line);
+          fitFixedWidthGroup(fittedLines);
+        }
+      }
+    }
+
+    function showGroupImmediate(lines, className = "") {
+      for (const line of lines) {
+        addLine(line, className);
+      }
+    }
+
+    function showSequenceImmediate(items) {
+      for (const item of items) {
+        if (item.pause || item.prompt || item.jumpGlitch) {
+          continue;
+        }
+
+        if (item.blank) {
+          addLine("");
+        } else if (item.group) {
+          showGroupImmediate(item.group, item.className || "");
+        } else if (item.instant) {
+          showLinesImmediate(item.instant, item.className || "", item.perLineClass || {});
+        } else if (item.showLines) {
+          showLinesImmediate(item.showLines, item.className || "", item.perLineClass || {});
+        } else if (item.link) {
+          addLink(item.link);
+        } else if (item.sharePrompt) {
+          addSharePrompt();
+        } else if (item.type) {
+          addLine(item.type, item.className || "");
+        }
+      }
+    }
+
+    function runDebugAll() {
+      cursor.remove();
+      stageIndex = stages.length - 1;
+      updateBackgroundReveal();
+      for (const sequence of stages.slice(1)) {
+        showSequenceImmediate(sequence);
+      }
+      triggerProgressGlitch(stageIndex);
       scrollToBottom();
     }
 
@@ -2122,6 +2199,14 @@
         const answer = input.value.trim();
         const hint = item.hints?.[answer];
         const sideAnswer = findSideAnswer(item, answer);
+
+        if (item.debugAll && isDebugAllAnswer(answer)) {
+          failMessage.textContent = "";
+          input.disabled = true;
+          button.disabled = true;
+          runDebugAll();
+          return;
+        }
 
         if (isLoveAnswer(answer)) {
           failMessage.textContent = "";
