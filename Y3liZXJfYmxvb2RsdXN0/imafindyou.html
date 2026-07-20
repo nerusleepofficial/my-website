@@ -594,10 +594,11 @@
       padding: 0.32em 0.82em;
       border-radius: 999px;
       font: 700 0.72em Arial, Helvetica, sans-serif;
-      line-height: 1;
+      line-height: 1.05;
       text-align: center;
       text-shadow: none;
       white-space: nowrap;
+      transform: translateY(0.06em);
     }
 
     .share-media {
@@ -625,17 +626,15 @@
     }
 
     .native-share-button {
-      border-color: rgba(150, 175, 255, 0.72);
-      background: rgba(92, 110, 185, 0.28);
-      color: rgba(226, 230, 255, 0.98);
-      box-shadow:
-        inset 0 0 0 1px rgba(235, 238, 255, 0.08),
-        0 0 14px rgba(120, 145, 235, 0.16);
+      border-color: rgba(215, 215, 215, 0.9);
+      background: #ffffff;
+      color: #0f1419;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
     }
 
     .native-share-button:hover,
     .native-share-button:focus-visible {
-      background: rgba(112, 135, 215, 0.38);
+      background: #e7e9ea;
     }
 
     .share-status {
@@ -753,9 +752,10 @@
       z-index: 0;
       background-image:
         linear-gradient(rgba(5, 5, 5, 0.3), rgba(5, 5, 5, 0.58)),
-        url("./assets/background-reveal.png");
+        url("./assets/imafindyou/background-reveal.png");
       background-position: center;
-      background-size: cover;
+      background-size: 100% 100%, 100% 100%;
+      background-repeat: no-repeat;
       filter: saturate(0.72) contrast(0.88) brightness(0.42);
       opacity: var(--image-reveal, 0.018);
       transition: opacity 1400ms ease, filter 1400ms ease;
@@ -992,7 +992,7 @@
     cursor.setAttribute("aria-hidden", "true");
 
     const speeds = {
-      normal: { min: 28, max: 82, lineDelay: 210 },
+      normal: { min: 18, max: 52, lineDelay: 150 },
       fast: { min: 3, max: 9, lineDelay: 25 },
       slow: { min: 105, max: 180, lineDelay: 520 }
     };
@@ -1290,7 +1290,7 @@
         prompt: "HANG",
         maxLength: 8,
         sideAnswers: [
-          { answer: "lonesome", url: "when_you_left.html" }
+          { answer: "lonesome", url: "when_you_left.html", label: "when_you_left.mem" }
         ],
         validate: (value) => isCommand(value, "hang")
       }
@@ -1331,7 +1331,7 @@
         maxLength: 7,
         hints: hangHints,
         sideAnswers: [
-          { answer: "unity", url: "we_are_the_same.html" }
+          { answer: "unity", url: "we_are_the_same.html", label: "we_are_the_same.mem" }
         ],
         validate: (value) => isCommand(value, "burn")
       }
@@ -1382,10 +1382,11 @@
         maxLength: 7,
         hints: killHints,
         sideAnswers: [
-          { answer: "outcast", url: "forsaken_child.html" },
+          { answer: "outcast", url: "forsaken_child.html", label: "forsaken_child.mem" },
           {
             answer: "master",
             url: "master.html",
+            label: "master.tmp",
             className: "purple",
             commandLine: String.raw`C:\Users\??_??> unlock .\Assets\images.enc`,
             linkPrompt: String.raw`C:\Users\??_??\Assets> `
@@ -1770,7 +1771,7 @@
           for (let index = 0; index < flickers; index += 1) {
             noise.textContent = randomNoiseText(speedName === "fast" ? 1 : 3);
             boostBackgroundRain(speedName === "fast" ? 0.12 : 0.22);
-            await wait(speedName === "fast" ? 4 : 10 + Math.random() * 18);
+            await wait(speedName === "fast" ? 4 : speedName === "slow" ? 10 + Math.random() * 18 : 6 + Math.random() * 12);
           }
 
           noise.textContent = "";
@@ -1792,33 +1793,43 @@
         const line = addLine("", className);
         const textNode = document.createTextNode("");
         const noise = document.createElement("span");
+        const characters = Array.from(text);
         noise.className = "pre-cursor-noise";
         line.appendChild(textNode);
         line.appendChild(noise);
-        return { text, textNode, noise };
+        return { characters, textNode, noise, typedCount: 0 };
       });
 
       if (textNodes.length > 0) {
         appendCursor(terminal.lastElementChild);
       }
 
-      const maxLength = Math.max(...lines.map((line) => line.length));
+      const lineLengths = textNodes.map(({ characters }) => characters.length).filter(Boolean);
+      const maxLength = lineLengths.length > 0 ? Math.max(...lineLengths) : 0;
+      const shortestLength = lineLengths.length > 0 ? Math.min(...lineLengths) : 0;
+      const stepCount = textNodes.length > 1 && shortestLength > 0 ? shortestLength : maxLength;
       setBackgroundRainTyping(true);
       try {
-        for (let index = 0; index < maxLength; index += 1) {
+        for (let index = 0; index < stepCount; index += 1) {
           const flickers = speedName === "fast" ? 1 : 2;
           for (let flickerIndex = 0; flickerIndex < flickers; flickerIndex += 1) {
-            for (const { text, noise } of textNodes) {
-              noise.textContent = index < text.length ? randomNoiseText(speedName === "fast" ? 1 : 2) : "";
+            for (const { characters, noise, typedCount } of textNodes) {
+              noise.textContent = typedCount < characters.length ? randomNoiseText(speedName === "fast" ? 1 : 2) : "";
             }
             boostBackgroundRain(speedName === "fast" ? 0.14 : 0.26);
-            await wait(speedName === "fast" ? 4 : 12);
+            await wait(speedName === "fast" ? 4 : speedName === "slow" ? 12 : 8);
           }
 
-          for (const { text, textNode, noise } of textNodes) {
+          for (const item of textNodes) {
+            const { characters, textNode, noise } = item;
             noise.textContent = "";
-            if (index < text.length) {
-              textNode.nodeValue += text[index];
+            const targetLength = Math.min(
+              characters.length,
+              Math.ceil(((index + 1) / stepCount) * characters.length)
+            );
+            if (targetLength > item.typedCount) {
+              textNode.nodeValue += characters.slice(item.typedCount, targetLength).join("");
+              item.typedCount = targetLength;
             }
           }
           boostBackgroundRain(speedName === "fast" ? 0.24 : 0.36);
