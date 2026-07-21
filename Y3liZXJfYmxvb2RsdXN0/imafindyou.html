@@ -1497,7 +1497,7 @@
     function updateBackgroundReveal() {
       const revealLevels = [0.04, 0.09, 0.14, 0.19, 0.24, 0.3];
       const opacity = revealLevels[Math.min(stageIndex, revealLevels.length - 1)];
-      const brightness = 0.48 + Math.min(stageIndex, 5) * 0.035;
+      const brightness = 0.48 + Math.min(stageIndex, 5) * 0.015;
       backgroundReveal.style.setProperty("--image-reveal", opacity);
       backgroundReveal.style.filter = `saturate(0.72) contrast(0.9) brightness(${brightness})`;
     }
@@ -2075,7 +2075,7 @@
       const line = addLine("");
       const command = document.createElement("span");
       command.className = "dim";
-      command.textContent = sideAnswer.linkPrompt || String.raw`C:\Users\lona\Memories> `;
+      command.textContent = sideAnswer.linkPrompt || String.raw`C:\Users\lona\Engram> `;
       const link = document.createElement("a");
       link.className = "terminal-link access-link";
       link.href = sideAnswer.url;
