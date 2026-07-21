@@ -1161,7 +1161,7 @@
       { type: "Repair? (y/n)" },
       {
         prompt: "repair",
-        debugAll: true,
+        debugSkips: true,
         abortOn: (value) => value.trim().toLowerCase() === "n",
         validate: (value) => value.trim().toLowerCase() === "y"
       }
@@ -2021,7 +2021,7 @@
       scrollToBottom();
     }
 
-    const specialAnswers = ["neru", "dbg_all"];
+    const specialAnswers = ["neru", "skpall", "skp1", "skp2", "skp3"];
 
     function normalizeAnswer(value) {
       return value.trim().replace(/\s+/g, "").toLowerCase();
@@ -2035,8 +2035,21 @@
       return normalizeAnswer(value) === "neru";
     }
 
-    function isDebugAllAnswer(value) {
-      return normalizeAnswer(value) === "dbg_all";
+    function getDebugSkipTarget(value) {
+      const normalizedAnswer = normalizeAnswer(value);
+      const debugSkips = {
+        skp1: 1,
+        skp2: 2,
+        skp3: 3
+      };
+
+      if (normalizedAnswer === "skpall") {
+        return "all";
+      }
+
+      return Object.prototype.hasOwnProperty.call(debugSkips, normalizedAnswer)
+        ? debugSkips[normalizedAnswer]
+        : null;
     }
 
     function addLoveAnswer() {
@@ -2154,6 +2167,24 @@
       scrollToBottom();
     }
 
+    function runDebugSkipToPrompt(targetStageIndex) {
+      cursor.remove();
+      stageIndex = targetStageIndex;
+      updateBackgroundReveal();
+
+      for (let index = 1; index <= targetStageIndex; index += 1) {
+        showSequenceImmediate(stages[index]);
+      }
+
+      triggerProgressGlitch(stageIndex);
+      const promptItem = stages[targetStageIndex].find((item) => item.prompt);
+      if (promptItem) {
+        addPromptForm(promptItem);
+      } else {
+        scrollToBottom();
+      }
+    }
+
     function addPromptForm(item) {
       cursor.remove();
 
@@ -2226,12 +2257,19 @@
         const hint = item.hints?.[answer];
         const sideAnswer = findSideAnswer(item, answer);
 
-        if (item.debugAll && isDebugAllAnswer(answer)) {
-          failMessage.textContent = "";
-          input.disabled = true;
-          button.disabled = true;
-          runDebugAll();
-          return;
+        if (item.debugSkips) {
+          const debugSkipTarget = getDebugSkipTarget(answer);
+          if (debugSkipTarget !== null) {
+            failMessage.textContent = "";
+            input.disabled = true;
+            button.disabled = true;
+            if (debugSkipTarget === "all") {
+              runDebugAll();
+            } else {
+              runDebugSkipToPrompt(debugSkipTarget);
+            }
+            return;
+          }
         }
 
         if (isLoveAnswer(answer)) {
