@@ -455,6 +455,99 @@
       text-shadow: 0 0 12px rgba(121, 184, 255, 0.32);
     }
 
+    .terminal-link:hover,
+    .terminal-link:focus-visible,
+    .terminal-link:active {
+      color: #ff365f;
+      outline: 0;
+      text-shadow:
+        0 0 10px rgba(255, 54, 95, 0.68),
+        0 0 22px rgba(176, 0, 32, 0.42);
+    }
+
+    .final-link-line {
+      margin: 0.18em 0 0.32em;
+    }
+
+    .final-find-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: min(17.4em, 100%);
+      padding: 0.24em;
+      border: 0;
+      border-radius: 999px;
+      color: rgba(238, 230, 246, 0.96);
+      background: transparent;
+      box-shadow: none;
+      font: 700 0.94em/1 "MS Gothic", "Osaka-Mono", "Courier New", monospace;
+      text-decoration: none;
+      text-shadow:
+        0.08em 0 rgba(70, 190, 255, 0.28),
+        -0.08em 0 rgba(255, 30, 90, 0.34),
+        0 0 12px rgba(255, 68, 142, 0.36);
+      overflow: visible;
+      transition: filter 120ms steps(2);
+    }
+
+    .final-find-button::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: -0.28em -0.46em;
+      border-radius: 999px;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(226, 218, 244, 0.72) 0 30%, rgba(132, 102, 166, 0.5) 52%, rgba(76, 50, 112, 0.26) 72%, rgba(22, 14, 34, 0) 100%);
+      filter: blur(0.18em);
+      opacity: 0.96;
+      pointer-events: none;
+      transition: filter 120ms steps(2), opacity 120ms steps(2), background 120ms steps(2);
+    }
+
+    .final-find-logo {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: auto;
+      filter:
+        drop-shadow(0 0 0.06em rgba(0, 0, 0, 0.72))
+        drop-shadow(0.08em 0 rgba(70, 190, 255, 0.22))
+        drop-shadow(-0.08em 0 rgba(255, 30, 90, 0.28))
+        drop-shadow(0 0 0.35em rgba(92, 34, 118, 0.28));
+      transition: filter 120ms steps(2);
+    }
+
+    .final-find-button:hover,
+    .final-find-button:focus-visible {
+      color: #ffffff;
+      background: transparent;
+      outline: 0;
+      box-shadow: none;
+    }
+
+    .final-find-button:hover::before,
+    .final-find-button:focus-visible::before {
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(247, 242, 255, 0.82) 0 28%, rgba(164, 130, 194, 0.58) 52%, rgba(92, 56, 142, 0.32) 74%, rgba(24, 16, 36, 0) 100%);
+      filter: blur(0.22em);
+      opacity: 1;
+    }
+
+    .final-find-button:hover .final-find-logo,
+    .final-find-button:focus-visible .final-find-logo {
+      filter:
+        brightness(1.08)
+        contrast(1.04)
+        drop-shadow(0 0 0.08em rgba(0, 0, 0, 0.78))
+        drop-shadow(0.1em 0 rgba(126, 178, 255, 0.28))
+        drop-shadow(-0.1em 0 rgba(78, 34, 132, 0.56))
+        drop-shadow(0 0 0.34em rgba(44, 16, 92, 0.54))
+        drop-shadow(0 0 0.58em rgba(66, 24, 126, 0.58));
+    }
+
     .terminal a[x-apple-data-detectors]:not(.terminal-link) {
       color: inherit !important;
       text-decoration: none !important;
@@ -1298,7 +1391,15 @@
         prompt: "HANG",
         maxLength: 8,
         sideAnswers: [
-          { answer: "lonesome", url: "when_you_left.html", label: "when_you_left.mem" }
+          { answer: "lonesome", url: "when_you_left.html", label: "when_you_left.mem" },
+          {
+            answer: "lona",
+            url: "https://youtu.be/5B7doUc1xeo",
+            label: "lona.fbx",
+            className: "purple",
+            accessSpeed: "normal",
+            linkPrompt: String.raw`C:\World\Body\fbx> `
+          }
         ],
         validate: (value) => isCommand(value, "hang")
       }
@@ -1339,7 +1440,15 @@
         maxLength: 7,
         hints: hangHints,
         sideAnswers: [
-          { answer: "unity", url: "we_are_the_same.html", label: "we_are_the_same.mem" }
+          { answer: "unity", url: "we_are_the_same.html", label: "we_are_the_same.mem" },
+          {
+            answer: "jump",
+            url: "https://youtu.be/5B7doUc1xeo",
+            label: "jump.wmv",
+            className: "purple",
+            accessSpeed: "normal",
+            linkPrompt: String.raw`C:\Users\lona\Engram> `
+          }
         ],
         validate: (value) => isCommand(value, "burn")
       }
@@ -1486,7 +1595,7 @@
       { pause: 1000 },
       { jumpGlitch: true },
       { type: "ＷＥＬＣＯＭＥ　ＴＯ　ＴＨＥ　ＯＴＨＥＲ　ＷＯＲＬＤ", className: "crimson", speed: "slow" },
-      { link: "https://www.neru-official.com/" },
+      { link: "https://youtu.be/5B7doUc1xeo", label: "ＦＩＮＤ　ＭＥ", button: true },
       { sharePrompt: true }
     ];
 
@@ -1885,16 +1994,24 @@
       await wait(delay > 0 ? 0 : 130);
     }
 
-    function addLink(url) {
+    function addLink(url, label = url, button = false) {
       cursor.remove();
 
-      const line = addLine("");
+      const line = addLine("", button ? "final-link-line" : "");
       const link = document.createElement("a");
-      link.className = "terminal-link";
+      link.className = button ? "final-find-button" : "terminal-link";
       link.href = url;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.textContent = url;
+      if (button) {
+        const logo = document.createElement("img");
+        logo.className = "final-find-logo";
+        logo.src = "./assets/imafindyou/find_me_logo.gif";
+        logo.alt = label;
+        link.appendChild(logo);
+      } else {
+        link.textContent = label;
+      }
       line.appendChild(link);
       scrollToBottom();
     }
@@ -2074,7 +2191,7 @@
       await typeGroup([
         "[OK] access authorized.",
         "[OK] アクセスが許可されました。"
-      ], accessClassName, "fast");
+      ], accessClassName, sideAnswer.accessSpeed || "fast");
       cursor.remove();
 
       if (sideAnswer.commandLine) {
@@ -2147,7 +2264,7 @@
         } else if (item.showLines) {
           showLinesImmediate(item.showLines, item.className || "", item.perLineClass || {});
         } else if (item.link) {
-          addLink(item.link);
+          addLink(item.link, item.label || item.link, Boolean(item.button));
         } else if (item.sharePrompt) {
           addSharePrompt();
         } else if (item.type) {
@@ -2376,7 +2493,7 @@
         } else if (item.jumpGlitch) {
           await triggerJumpScareGlitch();
         } else if (item.link) {
-          addLink(item.link);
+          addLink(item.link, item.label || item.link, Boolean(item.button));
         } else if (item.sharePrompt) {
           addSharePrompt();
         } else {
