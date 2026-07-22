@@ -531,16 +531,16 @@
     .final-find-button:hover::before,
     .final-find-button:focus-visible::before {
       background:
-        radial-gradient(ellipse at 50% 50%, rgba(247, 242, 255, 0.82) 0 28%, rgba(164, 130, 194, 0.58) 52%, rgba(92, 56, 142, 0.32) 74%, rgba(24, 16, 36, 0) 100%);
-      filter: blur(0.22em);
+        radial-gradient(ellipse at 50% 50%, rgba(252, 248, 255, 0.92) 0 28%, rgba(178, 142, 208, 0.68) 52%, rgba(108, 66, 164, 0.4) 74%, rgba(24, 16, 36, 0) 100%);
+      filter: blur(0.24em);
       opacity: 1;
     }
 
     .final-find-button:hover .final-find-logo,
     .final-find-button:focus-visible .final-find-logo {
       filter:
-        brightness(1.08)
-        contrast(1.04)
+        brightness(1.14)
+        contrast(1.06)
         drop-shadow(0 0 0.08em rgba(0, 0, 0, 0.78))
         drop-shadow(0.1em 0 rgba(126, 178, 255, 0.28))
         drop-shadow(-0.1em 0 rgba(78, 34, 132, 0.56))
@@ -2006,7 +2006,7 @@
       if (button) {
         const logo = document.createElement("img");
         logo.className = "final-find-logo";
-        logo.src = "./assets/imafindyou/find_me_logo.gif";
+        logo.src = "./assets/imafindyou/enter_logo.gif";
         logo.alt = label;
         link.appendChild(logo);
       } else {
