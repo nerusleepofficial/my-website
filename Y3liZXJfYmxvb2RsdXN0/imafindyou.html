@@ -430,6 +430,11 @@
       text-shadow: 0 0 13px rgba(185, 140, 255, 0.36);
     }
 
+    .dark-purple {
+      color: rgba(116, 78, 156, 0.96);
+      text-shadow: 0 0 13px rgba(116, 78, 156, 0.28);
+    }
+
     .pink {
       color: #ff8ac8;
       text-shadow: 0 0 13px rgba(255, 138, 200, 0.36);
@@ -463,6 +468,20 @@
       text-shadow:
         0 0 10px rgba(255, 54, 95, 0.68),
         0 0 22px rgba(176, 0, 32, 0.42);
+    }
+
+    .profile-output {
+      margin: 0.34em 0 0.2em;
+    }
+
+    .lunui-profile-image {
+      display: block;
+      width: min(420px, 100%);
+      height: auto;
+      border: 1px solid rgba(116, 78, 156, 0.34);
+      box-shadow:
+        0 0 14px rgba(116, 78, 156, 0.22),
+        0 0 28px rgba(34, 18, 52, 0.34);
     }
 
     .final-link-line {
@@ -2138,7 +2157,7 @@
       scrollToBottom();
     }
 
-    const specialAnswers = ["neru", "skpall", "skp1", "skp2", "skp3"];
+    const specialAnswers = ["neru", "lunui", "skpall", "skp1", "skp2", "skp3"];
 
     function normalizeAnswer(value) {
       return value.trim().replace(/\s+/g, "").toLowerCase();
@@ -2150,6 +2169,10 @@
 
     function isLoveAnswer(value) {
       return normalizeAnswer(value) === "neru";
+    }
+
+    function isLunuiAnswer(value) {
+      return normalizeAnswer(value) === "lunui";
     }
 
     function getDebugSkipTarget(value) {
@@ -2172,6 +2195,36 @@
     function addLoveAnswer() {
       addLine("");
       addLine("Thank you for playing<3", "pink");
+    }
+
+    async function addLunuiAnswer() {
+      addLine("");
+      showGroupImmediate([
+        "[OK] access authorized.",
+        "[OK] アクセスが許可されました。"
+      ], "dark-purple");
+      addLine("");
+      await typeLine(String.raw`C:\Users\lunui>  scan --target=user_profile`, "dim", "fast");
+      cursor.remove();
+      addLine("");
+
+      const imageLine = addLine("", "profile-output");
+      const image = document.createElement("img");
+      image.className = "lunui-profile-image";
+      image.src = "./assets/imafindyou/lunui_prof.png";
+      image.alt = "";
+      imageLine.appendChild(image);
+
+      const linkLine = addLine("");
+      const link = document.createElement("a");
+      link.className = "terminal-link access-link";
+      link.href = "https://lunui.carrd.co/";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "https://lunui.carrd.co/";
+      linkLine.appendChild(link);
+      addLine("#電脳殺意");
+      scrollToBottom();
     }
 
     function findSideAnswer(item, answer) {
@@ -2322,6 +2375,7 @@
       form.setAttribute("aria-label", item.prompt);
       const renderedSideAnswers = new Set();
       let loveAnswerRendered = false;
+      let lunuiAnswerRendered = false;
 
       const failMessage = document.createElement("div");
       failMessage.className = "prompt-fail";
@@ -2394,6 +2448,18 @@
           if (!loveAnswerRendered) {
             loveAnswerRendered = true;
             addLoveAnswer();
+          }
+          input.value = "";
+          input.focus();
+          scrollToBottom();
+          return;
+        }
+
+        if (isLunuiAnswer(answer)) {
+          failMessage.textContent = "";
+          if (!lunuiAnswerRendered) {
+            lunuiAnswerRendered = true;
+            await addLunuiAnswer();
           }
           input.value = "";
           input.focus();
