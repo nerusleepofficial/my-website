@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no, url=no">
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9LB5VHV3X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-S9LB5VHV3X');
+  </script>
+  <title>ＦＯＲＳＡＫＥＮ　ＣＨＩＬＤ</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050505;
+      --text: #d8d4dc;
+      --purple: #a97bd6;
+      --red: #aa1630;
+    }
+
+    @font-face {
+      font-family: "Win98PixelTitle";
+      src: url("./assets/fonts/d2luOTgtcGl4ZWw=.ttf") format("truetype");
+      font-display: swap;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(178, 126, 220, 0.075), transparent 38%),
+        radial-gradient(circle at 80% 18%, rgba(176, 0, 32, 0.06), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family: Consolas, "Lucida Console", "Courier New", monospace;
+    }
+
+    .background-rain {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0.72;
+      mix-blend-mode: screen;
+    }
+
+    .background-vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(100, 62, 135, 0.14), transparent 34%),
+        linear-gradient(90deg, rgba(5, 5, 5, 0.52), rgba(5, 5, 5, 0.12) 48%, rgba(5, 5, 5, 0.52)),
+        linear-gradient(rgba(5, 5, 5, 0.08), rgba(5, 5, 5, 0.58));
+    }
+
+    .scanlines {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.026) 0,
+        rgba(255, 255, 255, 0.026) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+    }
+
+    .screen {
+      position: relative;
+      z-index: 4;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      padding: clamp(12px, 2.6vw, 30px);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .win98-window {
+      width: min(980px, 100%);
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+      border: 2px solid;
+      border-color: #f4f4f4 #3f3f3f #3f3f3f #f4f4f4;
+      box-shadow:
+        2px 2px 0 rgba(0, 0, 0, 0.78),
+        inset 1px 1px 0 #ffffff,
+        inset -1px -1px 0 #808080;
+    }
+
+    .win98-titlebar {
+      flex: 0 0 auto;
+      min-height: 24px;
+      margin: 2px;
+      padding: 2px 3px 2px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: linear-gradient(90deg, #000080 0%, #0a3d9f 58%, #1084d0 100%);
+      color: #ffffff;
+      font-family: "Win98PixelTitle", "MS Sans Serif", Tahoma, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1;
+      text-shadow: none;
+      -webkit-font-smoothing: none;
+      font-smooth: never;
+      text-rendering: optimizeSpeed;
+      user-select: none;
+    }
+
+    .win98-title-text {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      line-height: 1;
+      transform: translateY(1px);
+    }
+
+    .win98-title-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .win98-title-icon {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      image-rendering: pixelated;
+      object-fit: contain;
+    }
+
+    .win98-buttons {
+      display: flex;
+      gap: 2px;
+      flex: 0 0 auto;
+    }
+
+    .win98-button {
+      position: relative;
+      width: 18px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 0;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      color: #000000;
+      font-family: Arial, sans-serif;
+      font-size: 0;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .win98-button::before,
+    .win98-button::after {
+      content: "";
+      position: absolute;
+      display: block;
+    }
+
+    .win98-button.minimize::before {
+      left: 4px;
+      right: 4px;
+      bottom: 3px;
+      height: 2px;
+      background: #000000;
+    }
+
+    .win98-button.maximize::before {
+      width: 8px;
+      height: 7px;
+      top: 50%;
+      left: 50%;
+      box-sizing: border-box;
+      border: 2px solid #000000;
+      transform: translate(-50%, -50%);
+    }
+
+    .win98-button.close::before,
+    .win98-button.close::after {
+      width: 10px;
+      height: 2px;
+      top: 50%;
+      left: 50%;
+      background: #000000;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .win98-button.close::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    .win98-content {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      margin: 0 4px 4px;
+      padding: clamp(10px, 1.6vw, 20px);
+      position: relative;
+      background: transparent;
+      border: 2px solid;
+      border-color: #404040 #ffffff #ffffff #404040;
+      box-shadow:
+        inset 1px 1px 0 #000000,
+        inset -1px -1px 0 #dfdfdf;
+      overflow: hidden;
+    }
+
+    .page {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 860px;
+      height: 100%;
+      margin: 0 auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: clamp(10px, 2vw, 24px) 20px 18vh 0;
+      text-shadow: 0 0 12px rgba(216, 212, 220, 0.18);
+      scrollbar-width: none;
+    }
+
+    .page::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    .page::-webkit-scrollbar-track {
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #808080 #ffffff #ffffff #808080;
+    }
+
+    .page::-webkit-scrollbar-thumb {
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+    }
+
+    .mobile-win98-scrollbar {
+      display: flex;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      bottom: 4px;
+      z-index: 8;
+      width: 16px;
+      flex-direction: column;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      pointer-events: auto;
+    }
+
+    .mobile-win98-scrollbar.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-win98-scrollbar-button {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 0;
+      color: #000000;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      font-family: Arial, sans-serif;
+      font-size: 0;
+      line-height: 1;
+    }
+
+    .mobile-win98-scrollbar-button::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+
+    .mobile-win98-scrollbar-button:first-child::before {
+      border-bottom: 6px solid #000000;
+    }
+
+    .mobile-win98-scrollbar-button:last-child::before {
+      border-top: 6px solid #000000;
+    }
+
+    .mobile-win98-scrollbar-track {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 24px;
+      background: #d4d0c8;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #ffffff;
+      overflow: hidden;
+    }
+
+    .mobile-win98-scrollbar-thumb {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 28px;
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #404040 #404040 #ffffff;
+      box-shadow:
+        inset 1px 1px 0 #dfdfdf,
+        inset -1px -1px 0 #808080;
+      transform: translateY(0);
+    }
+
+    @media (hover: none), (pointer: coarse), (max-width: 768px) {
+      .mobile-win98-scrollbar {
+        display: flex;
+      }
+
+      .page {
+        padding-right: 20px;
+        scrollbar-width: none;
+      }
+
+      .page::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+    }
+
+    .header-art {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(9px, 2.4vw, 22px);
+      max-width: 100%;
+      margin: 0 auto clamp(28px, 5vw, 46px);
+      filter:
+        drop-shadow(0 0 14px rgba(169, 123, 214, 0.26))
+        drop-shadow(0 0 24px rgba(170, 22, 48, 0.16));
+    }
+
+    .statue {
+      flex: 0 1 auto;
+      width: clamp(34px, 8vw, 50px);
+      height: auto;
+      min-width: 0;
+    }
+
+    .header-logo {
+      flex: 0 1 461px;
+      width: min(72vw, 461px);
+      height: auto;
+      min-width: 0;
+    }
+
+    .poem {
+      width: min(100%, 42ch);
+      margin: 0 auto;
+      font-size: clamp(15px, 2.1vw, 20px);
+      line-height: 1.62;
+      letter-spacing: 0;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .poem-title,
+    .mirror {
+      color: rgba(224, 217, 230, 0.96);
+      text-shadow:
+        0 0 12px rgba(216, 212, 220, 0.26),
+        0 0 28px rgba(169, 123, 214, 0.18);
+    }
+
+    .quiet,
+    .place {
+      color: rgba(202, 180, 232, 0.86);
+      text-shadow: 0 0 14px rgba(169, 123, 214, 0.22);
+    }
+
+    .alone {
+      color: rgba(255, 92, 116, 0.86);
+      text-shadow: 0 0 14px rgba(176, 0, 32, 0.32);
+    }
+
+    .translation {
+      display: block;
+      color: rgba(216, 212, 220, 0.48);
+      font-size: 0.86em;
+      line-height: 1.38;
+      text-shadow: 0 0 8px rgba(216, 212, 220, 0.08);
+    }
+
+    .debug-code {
+      width: max-content;
+      max-width: 100%;
+      margin: clamp(10px, 2.6vw, 18px) auto 0;
+      color: rgba(216, 212, 220, 0.22);
+      font: 0.92em/1.34 Consolas, "Lucida Console", "Courier New", monospace;
+      letter-spacing: 0;
+      white-space: pre;
+      font-variant-numeric: tabular-nums;
+      overflow-x: auto;
+      text-shadow: 0 0 8px rgba(216, 212, 220, 0.04);
+    }
+
+    .middle-art,
+    .ending-art {
+      display: block;
+      height: auto;
+      margin: clamp(20px, 5vw, 38px) auto;
+      filter:
+        drop-shadow(0 0 13px rgba(169, 123, 214, 0.28))
+        drop-shadow(0 0 24px rgba(170, 22, 48, 0.14));
+    }
+
+    .cat-art {
+      width: min(32vw, 116px);
+      min-width: 86px;
+    }
+
+    .computer-art {
+      width: min(58vw, 222px);
+      min-width: 150px;
+    }
+
+    .ending-art {
+      width: min(50vw, 266px);
+      min-width: 156px;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 640px) {
+      .screen {
+        padding: 8px;
+        touch-action: pan-y;
+      }
+
+      .win98-window {
+        width: 100%;
+      }
+
+      .win98-titlebar {
+        min-height: 22px;
+        gap: 6px;
+        padding-left: 5px;
+        font-size: 12px;
+      }
+
+      .win98-title-text {
+        transform: translateY(1px);
+      }
+
+      .win98-button {
+        width: 17px;
+        height: 15px;
+        font-size: 0;
+      }
+
+      .win98-content {
+        margin: 0 3px 3px;
+        padding: 9px;
+      }
+
+      .page {
+        max-width: 100%;
+        padding-bottom: 20vh;
+      }
+
+      .header-art {
+        gap: 8px;
+        margin-bottom: 30px;
+      }
+
+      .statue {
+        width: min(12vw, 42px);
+      }
+
+      .header-logo {
+        width: min(70vw, 330px);
+      }
+
+      .poem {
+        width: min(100%, 34ch);
+        font-size: clamp(14px, 4.1vw, 17px);
+        line-height: 1.58;
+      }
+
+      .cat-art {
+        width: min(36vw, 112px);
+        min-width: 86px;
+      }
+
+      .computer-art {
+        width: min(68vw, 222px);
+      }
+
+      .ending-art {
+        width: min(64vw, 240px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="screen" aria-label="Forsaken child">
+    <section class="win98-window" aria-label="Windows 98 page frame">
+      <div class="win98-titlebar" aria-hidden="true">
+        <span class="win98-title-label">
+          <img class="win98-title-icon" src="../favicon.png" alt="">
+          <span class="win98-title-text">FORSAKEN CHILD</span>
+        </span>
+        <span class="win98-buttons">
+          <span class="win98-button minimize">_</span>
+          <span class="win98-button maximize">□</span>
+          <span class="win98-button close">×</span>
+        </span>
+      </div>
+      <div class="win98-content">
+        <canvas class="background-rain" id="backgroundRain" aria-hidden="true"></canvas>
+        <div class="background-vignette" aria-hidden="true"></div>
+        <article class="page">
+          <div class="header-art" aria-hidden="true">
+            <img class="statue" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/c3RhdHVl.gif" alt="">
+            <img class="header-logo" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/bG9nbzA1.gif" alt="">
+            <img class="statue" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/c3RhdHVl.gif" alt="">
+          </div>
+
+      <div class="poem"><span class="poem-title">That child again</span>
+<span class="translation">またあの子だ</span>
+
+No place to return
+<span class="translation">帰る場所もない</span>
+No place to want to return
+<span class="translation">帰りたい場所がない</span>
+
+In the corner of the classroom
+<span class="translation">教室の隅で</span>
+tracing the grooves in the floor
+<span class="translation">床の溝をなぞっている</span>
+
+Breathing quietly
+<span class="translation">静かに息をして</span>
+trying not to be in the way
+<span class="translation">邪魔にならないように</span>
+
+The world, maybe
+<span class="translation">この世界は多分</span>
+never knew
+<span class="translation">知らなかった</span>
+where to put that child
+<span class="translation">あの子を置くべき場所を</span>
+
+So it placed them
+<span class="translation">だから置いた</span>
+by the window
+<span class="translation">窓の側に</span>
+
+Placed them
+<span class="translation">だから置いた</span>
+on the rooftop
+<span class="translation">屋上に</span>
+
+Placed them
+<span class="translation">だから置いた</span>
+inside the silence
+<span class="translation">静寂の中に</span>
+
+Told them to stay there
+<span class="translation">そこに居なさいと言って</span>
+until Mom or Dad
+<span class="translation">ママかパパが</span>
+came to pick them up
+<span class="translation">お迎えに来るまで</span>
+
+<span class="alone">And no one came</span>
+<span class="translation">結局、誰も迎えに来なかった</span></div>
+
+      <img class="middle-art cat-art" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/Y2F0.gif" alt="">
+
+      <div class="poem">That child
+<span class="translation">あの子は</span>
+was crying the wrong way
+<span class="translation">泣き方を間違えていた</span>
+
+Too quiet
+<span class="translation">静か過ぎた</span>
+to ask for help
+<span class="translation">助けを求めるには</span>
+
+Saying I’m okay
+<span class="translation">大丈夫って言いながら</span>
+Breaking day by day
+<span class="translation">日に日に壊れていく</span>
+
+Melting into
+<span class="translation">溶けていく</span>
+the shape of today
+<span class="translation">今日の形へと</span>
+
+That child
+<span class="translation">あの子は</span>
+is still somewhere
+<span class="translation">まだどこかにいる</span>
+
+Beyond the closed school gate
+<span class="translation">閉まった校門の先で</span>
+
+In the evening classroom
+<span class="translation">誰にも名前を呼ばれなかった</span>
+where no one called their name
+<span class="translation">夕暮れの教室で</span>
+
+Still
+<span class="translation">今も</span>
+Looking this way
+<span class="translation">こちらを見つめている</span></div>
+
+      <img class="middle-art computer-art" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/Y29tcHV0ZXI=.gif" alt="">
+
+      <div class="poem"><span class="poem-title">Forsaken child</span>
+<span class="translation">捨てられた子</span>
+
+But it wasn’t only
+<span class="translation">でも</span>
+the world that abandoned them
+<span class="translation">捨てたのは世界だけじゃない</span>
+
+Before anyone else
+<span class="translation">誰よりも先に</span>
+
+There was someone
+<span class="translation">その手を離した</span>
+who let go of that hand
+<span class="translation">誰かがいる</span>
+
+And now
+<span class="translation">今や</span>
+
+The face of that child is known
+<span class="translation">あの子の顔を知っているのは</span>
+
+<span class="alone">Only by the mirror</span>
+<span class="translation">鏡だけだ</span></div>
+
+      <img class="ending-art" src="./assets/Zm9yc2FrZW5fY2hpbGQ=/YXBwbGU=.gif" alt="">
+      <pre class="debug-code">+++++++++++++++++++++++
+5b 44 45 42 55 47 20 43
+4f 44 45 5d 20 73 6b 70
+33 0a 49 4e 50 55 54 3a
+20 52 65 70 61 69 72 3f
++++++++++++++++++++++++</pre>
+        </article>
+        <div class="scanlines" aria-hidden="true"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const backgroundRainCanvas = document.querySelector("#backgroundRain");
+    const backgroundRainContext = backgroundRainCanvas.getContext("2d");
+    const backgroundGlyphs = "01#$%&*+-/<>?=[]{}@ABCDEFGHIJKLMNOPQRSTUVWXYZ¥";
+    let backgroundRainColumns = [];
+    let backgroundRainColumnCount = 0;
+    let backgroundRainFontSize = 16;
+    let backgroundRainIntensity = 0.72;
+
+    function getBackgroundRainSize() {
+      const bounds = backgroundRainCanvas.parentElement.getBoundingClientRect();
+      return {
+        width: Math.max(1, Math.floor(bounds.width)),
+        height: Math.max(1, Math.floor(bounds.height))
+      };
+    }
+
+    function resizeBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
+      const pixelRatio = window.devicePixelRatio || 1;
+      backgroundRainCanvas.width = Math.floor(width * pixelRatio);
+      backgroundRainCanvas.height = Math.floor(height * pixelRatio);
+      backgroundRainCanvas.style.width = `${width}px`;
+      backgroundRainCanvas.style.height = `${height}px`;
+      backgroundRainContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+      backgroundRainFontSize = Math.max(13, Math.min(18, Math.floor(width / 70)));
+      backgroundRainColumnCount = Math.ceil(width / backgroundRainFontSize);
+      backgroundRainColumns = Array.from({ length: backgroundRainColumnCount }, () => (
+        Math.floor(Math.random() * height / backgroundRainFontSize)
+      ));
+    }
+
+    function drawBackgroundRain() {
+      const { width, height } = getBackgroundRainSize();
+      backgroundRainContext.fillStyle = `rgba(5, 5, 5, ${0.095 + backgroundRainIntensity * 0.045})`;
+      backgroundRainContext.fillRect(0, 0, width, height);
+      backgroundRainContext.font = `${backgroundRainFontSize}px Consolas, "Courier New", monospace`;
+
+      for (let index = 0; index < backgroundRainColumnCount; index += 1) {
+        if (Math.random() > 0.48 + backgroundRainIntensity * 0.32) {
+          continue;
+        }
+
+        const glyph = backgroundGlyphs[Math.floor(Math.random() * backgroundGlyphs.length)];
+        const x = index * backgroundRainFontSize;
+        const y = backgroundRainColumns[index] * backgroundRainFontSize;
+        backgroundRainContext.fillStyle = Math.random() > 0.84
+          ? `rgba(210, 186, 242, ${0.32 + backgroundRainIntensity * 0.34})`
+          : `rgba(132, 92, 176, ${0.21 + backgroundRainIntensity * 0.28})`;
+        backgroundRainContext.fillText(glyph, x, y);
+
+        if (y > height + backgroundRainFontSize && Math.random() > 0.965) {
+          backgroundRainColumns[index] = 0;
+        } else {
+          backgroundRainColumns[index] += 1;
+        }
+      }
+
+      backgroundRainIntensity = Math.max(0.68, backgroundRainIntensity * 0.99);
+      requestAnimationFrame(drawBackgroundRain);
+    }
+
+    function installMobileWin98Scrollbar(scrollElement) {
+      const host = scrollElement.closest(".win98-content");
+      if (!host || host.querySelector(".mobile-win98-scrollbar")) {
+        return;
+      }
+
+      const scrollbar = document.createElement("div");
+      scrollbar.className = "mobile-win98-scrollbar is-hidden";
+      scrollbar.setAttribute("aria-hidden", "true");
+      scrollbar.innerHTML = `
+        <button class="mobile-win98-scrollbar-button" type="button" tabindex="-1">▲</button>
+        <div class="mobile-win98-scrollbar-track">
+          <div class="mobile-win98-scrollbar-thumb"></div>
+        </div>
+        <button class="mobile-win98-scrollbar-button" type="button" tabindex="-1">▼</button>
+      `;
+      host.appendChild(scrollbar);
+
+      const [upButton, downButton] = scrollbar.querySelectorAll(".mobile-win98-scrollbar-button");
+      const track = scrollbar.querySelector(".mobile-win98-scrollbar-track");
+      const thumb = scrollbar.querySelector(".mobile-win98-scrollbar-thumb");
+
+      function updateMobileScrollbar() {
+        const maxScroll = scrollElement.scrollHeight - scrollElement.clientHeight;
+        if (maxScroll <= 1) {
+          scrollbar.classList.add("is-hidden");
+          return;
+        }
+
+        scrollbar.classList.remove("is-hidden");
+        const trackHeight = Math.max(1, track.clientHeight);
+        const thumbHeight = Math.min(
+          trackHeight,
+          Math.max(28, Math.round(trackHeight * scrollElement.clientHeight / scrollElement.scrollHeight))
+        );
+        const travel = Math.max(0, trackHeight - thumbHeight);
+        const thumbTop = Math.round((scrollElement.scrollTop / maxScroll) * travel);
+        thumb.style.height = `${thumbHeight}px`;
+        thumb.style.transform = `translateY(${thumbTop}px)`;
+      }
+
+      upButton.addEventListener("click", () => {
+        scrollElement.scrollBy({ top: -scrollElement.clientHeight * 0.85, behavior: "smooth" });
+      });
+      downButton.addEventListener("click", () => {
+        scrollElement.scrollBy({ top: scrollElement.clientHeight * 0.85, behavior: "smooth" });
+      });
+      scrollElement.addEventListener("scroll", updateMobileScrollbar, { passive: true });
+      window.addEventListener("resize", updateMobileScrollbar);
+      window.addEventListener("orientationchange", () => setTimeout(updateMobileScrollbar, 240));
+      if (window.ResizeObserver) {
+        new ResizeObserver(updateMobileScrollbar).observe(scrollElement);
+      }
+      setTimeout(updateMobileScrollbar, 0);
+    }
+
+    resizeBackgroundRain();
+    window.addEventListener("resize", resizeBackgroundRain);
+    if (window.ResizeObserver) {
+      new ResizeObserver(resizeBackgroundRain).observe(backgroundRainCanvas.parentElement);
+    }
+    installMobileWin98Scrollbar(document.querySelector(".page"));
+    drawBackgroundRain();
+  </script>
+</body>
+</html>
